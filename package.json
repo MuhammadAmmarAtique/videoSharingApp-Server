@@ -3,9 +3,16 @@
   "version": "1.0.0",
   "description": "Creating backend project for Video Sharing Platform",
   "main": "index.js",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "nodemon src/index.js"
   },
   "author": "Muhammad Ammar Atique",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5"
+  }
 }
