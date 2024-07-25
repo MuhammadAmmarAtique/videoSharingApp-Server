@@ -1,24 +1,18 @@
-import mongoose from "mongoose";
-import express from "express";
-const app = express();
-
+import dbConnection from "./db/index.js";
 import dotenv from "dotenv";
-dotenv.config();
-import { DB_NAME } from "./constants.js";
+dotenv.config({path:'./env'});
 
-(async () => {
-  try {
-    await mongoose.connect(`${process.env.MONGODB_URL}/${DB_NAME}`);
-    app.on("error", (error) => {
-      console.log("Error:: Express App cannot communicate with DB ",error);
-      throw error;
-    });
+// 2nd approach of Database Connection
+dbConnection();
 
-    app.listen(process.env.PORT, () => {
-      console.log(`Example app listening on port ${process.env.PORT}`)
-    })
-  } catch (error) {
-    console.log("DB connection error",error);
-    throw error;
-  }
-})();
+// 1st approach of Database Connection
+// (async () => {
+//   try {
+//     await mongoose.connect(`${process.env.MONGODB_URL}/${DB_NAME}`);
+//     console.log("Database Connection Successfull.");
+//   }
+//   catch (error) {
+//     console.log("Database Connection Failed :: line 13 index.js::", error);
+//     throw error;
+//   }
+// })();
