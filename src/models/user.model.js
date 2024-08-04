@@ -62,9 +62,9 @@ userSchema.pre("save", async function (next) {
 userSchema.methods.isPasswordCorrect = async function (UserEnteredPassword) {
   return await bcrypt.compare(UserEnteredPassword, this.password); //true/false will be returned
 };
-//Access Token Generator Method
+//Access Token Generator Method using jwt
 userSchema.methods.generateAccessToken = function () {
-  jsonwebtoken.sign(
+  return jsonwebtoken.sign(
     {
       _id: this.id,
       username: this.username,
@@ -78,9 +78,9 @@ userSchema.methods.generateAccessToken = function () {
   );
 };
 
-//Refresh Token Generator Method
+//Refresh Token Generator Method using jwt
 userSchema.methods.generateRefreshToken = function () {
-  jsonwebtoken.sign(
+  return jsonwebtoken.sign(
     {
       _id: this.id,
     },
