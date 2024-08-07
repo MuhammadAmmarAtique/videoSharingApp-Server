@@ -1,19 +1,10 @@
 import { ApiError } from "../utils/ApiError.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import { User } from "../models/user.model.js";
-import { uploadOnCloudinary } from "../utils/cloudinary.js"
+import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
 
-const registerUser = asyncHandler(async (req, res) => { 
-  // get user details from frontend
-  // validation - not empty
-  // check if user already exists: username, email
-  // check for images, check for avatar
-  // upload them to cloudinary, avatar
-  // create user object - create entry in db
-  // remove password and refresh token field from response
-  // check for user creation
-  // return res
-
+const registerUser = asyncHandler(async (req, res) => {
   //1- getting user details
   const { username, email, fullName, password } = req.body;
   console.log("username::", username);
@@ -29,7 +20,6 @@ const registerUser = asyncHandler(async (req, res) => {
   const existedUser = User.find({
     $or: [{ username }, { email }],
   });
-  
 
   if (existedUser) {
     throw new ApiError("User with same email or password already exists ", 400);
@@ -40,20 +30,40 @@ const registerUser = asyncHandler(async (req, res) => {
   const coverImageLocalPath = req.files?.coverImage[0]?.path;
 
   if (!avatarLocalPath) {
-    throw new ApiError("Avatar image is must required for registration", 406)
+    throw new ApiError("Avatar image is must required for registration", 406);
   }
 
   // 5- Uploading images in cloudinary
-  const uploadedAvatar= await uploadOnCloudinary(avatarLocalPath)
-  const uploadedCoverImg = await uploadOnCloudinary(coverImageLocalPath)
+  const uploadedAvatar = await uploadOnCloudinary(avatarLocalPath);
+  const uploadedCoverImg = await uploadOnCloudinary(coverImageLocalPath);
 
   if (!uploadedAvatar) {
-    throw new ApiError ("Avatar image not uploaded", 406)
+    throw new ApiError("Avatar image not uploaded", 406);
   }
 
+  // 6- create user object and doing entry in db
+  const user = await User.create({
+    username: username.toLowerCase(),
+    email,
+    fullName,
+    password,
+    avatar: uploadedAvatar.url,
+    coverImage: uploadedCoverImg?.url || "",
+  });
 
-  res.send("all ok");
-  res.end();
+  // 7+8- checking if User is created in db and removing password and refresh token from it
+  const createdUser = await User.findById(user._id).select(
+    "-password -refreshToken"
+  );
+
+  if (!createdUser) {
+    throw new ApiError("Error during user registration ", 500);
+  }
+
+  //9- returning response
+  return res
+    .status(200)
+    .json(new ApiResponse(201, createdUser, "User Created Successfully!"));
 });
 
 export default registerUser;
