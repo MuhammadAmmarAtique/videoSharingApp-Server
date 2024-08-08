@@ -7,7 +7,6 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 const registerUser = asyncHandler(async (req, res) => {
   //1- getting user details
   const { username, email, fullName, password } = req.body;
-  console.log("username::", username);
 
   //2- validating that if any of user entered data is empty
   if (
@@ -17,17 +16,17 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 
   // 3- checking if user with same username or email already exists
-  const existedUser = User.find({
+  const existedUser = await User.findOne({
     $or: [{ username }, { email }],
   });
-
+  
   if (existedUser) {
     throw new ApiError("User with same email or password already exists! ", 400);
   }
 
   // 4- checking if user gave us images specially avatar
-  const avatarLocalPath = req.files?.avatar[0]?.path;
-  const coverImageLocalPath = req.files?.coverImage[0]?.path;
+  const avatarLocalPath = req.files?.avatar?.[0]?.path;
+  const coverImageLocalPath = req.files?.coverImage?.[0]?.path;
 
   if (!avatarLocalPath) {
     throw new ApiError("Avatar image is must required for Registration!", 406);

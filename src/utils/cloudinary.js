@@ -3,9 +3,9 @@ import fs from "fs"; //built-in file system library of node.js, no need to insta
 
 // Configuration
 cloudinary.config({
-  cloud_name: process.env.CLOUD_NAME,
-  api_key: process.env.API_KEY,
-  api_secret: process.env.API_SECRET,
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
 const uploadOnCloudinary = async (filePath) => {
@@ -16,8 +16,8 @@ const uploadOnCloudinary = async (filePath) => {
       resource_type: "auto", //is it image/video/audio, we set auto to check automatically
     });
     // Remove the locally saved temporary file after successful upload
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
+    if (fs.existsSync(filePath)) { 
+      fs.unlinkSync(filePath);  //comment these 2 lines to see files inside public directory.
     }
     console.log("File uploaded Successfully on Cloudinary! ", response.url);
     return response;
