@@ -13,7 +13,7 @@ const registerUser = asyncHandler(async (req, res) => {
   if (
     [username, email, fullName, password].some((field) => field.trim() === "")
   ) {
-    throw new ApiError("Must enter all input fileds", 400);
+    throw new ApiError("Must enter all required input fields! ", 400);
   }
 
   // 3- checking if user with same username or email already exists
@@ -22,7 +22,7 @@ const registerUser = asyncHandler(async (req, res) => {
   });
 
   if (existedUser) {
-    throw new ApiError("User with same email or password already exists ", 400);
+    throw new ApiError("User with same email or password already exists! ", 400);
   }
 
   // 4- checking if user gave us images specially avatar
@@ -30,7 +30,7 @@ const registerUser = asyncHandler(async (req, res) => {
   const coverImageLocalPath = req.files?.coverImage[0]?.path;
 
   if (!avatarLocalPath) {
-    throw new ApiError("Avatar image is must required for registration", 406);
+    throw new ApiError("Avatar image is must required for Registration!", 406);
   }
 
   // 5- Uploading images in cloudinary
@@ -38,7 +38,7 @@ const registerUser = asyncHandler(async (req, res) => {
   const uploadedCoverImg = await uploadOnCloudinary(coverImageLocalPath);
 
   if (!uploadedAvatar) {
-    throw new ApiError("Avatar image not uploaded", 406);
+    throw new ApiError("Problem during Avatar image Upload!", 406);
   }
 
   // 6- create user object and doing entry in db
@@ -57,13 +57,13 @@ const registerUser = asyncHandler(async (req, res) => {
   );
 
   if (!createdUser) {
-    throw new ApiError("Error during user registration ", 500);
+    throw new ApiError("Server Error during user Registration! ", 500);
   }
 
   //9- returning response
   return res
     .status(200)
-    .json(new ApiResponse(201, createdUser, "User Created Successfully!"));
+    .json(new ApiResponse(201, createdUser, "User Created Successfully! "));
 });
 
 export default registerUser;
