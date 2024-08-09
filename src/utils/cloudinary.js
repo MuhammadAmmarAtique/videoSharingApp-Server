@@ -19,11 +19,11 @@ const uploadOnCloudinary = async (filePath) => {
     if (fs.existsSync(filePath)) { 
       fs.unlinkSync(filePath);  //comment these 2 lines to see files inside public directory.
     }
-    console.log("File uploaded Successfully on Cloudinary! ", response.url);
+    console.log("File uploaded Successfully on Cloudinary! ");
     return response;
   }
   catch (error) {
-    console.log("File upload failed on Cloudinary! ", error);
+    console.log("File uploading failed on Cloudinary! ", error);
   }
 };
 
