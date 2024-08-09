@@ -19,9 +19,12 @@ const registerUser = asyncHandler(async (req, res) => {
   const existedUser = await User.findOne({
     $or: [{ username }, { email }],
   });
-  
+
   if (existedUser) {
-    throw new ApiError("User with same email or password already exists! ", 400);
+    throw new ApiError(
+      "User with same email or password already exists! ",
+      400
+    );
   }
 
   // 4- checking if user gave us images specially avatar
@@ -65,4 +68,14 @@ const registerUser = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, createdUser, "User Created Successfully! "));
 });
 
-export default registerUser;
+const loginUser = asyncHandler(async (req, res) => {
+  //1) geting data from user for authentication
+  const { username, email, password } = req.body;
+  if (username.trim() === "" && email.trim() === "") {
+    throw new ApiError("username or email is must required for login", 400);
+  }
+
+  return res.status(201).send("Okay hogya");
+});
+
+export { registerUser, loginUser };
