@@ -4,6 +4,23 @@ import { User } from "../models/user.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 
+const generateAccessAndRefreshToken = async (userId) => {
+  try {
+    const user = await User.findById(userId);
+    const AccessToken = user.generateAccessToken();
+    const RefreshToken = user.generateRefreshToken();
+    user.refreshToken = RefreshToken;
+    await user.save({ validateBeforeSave: false });
+    return { AccessToken, RefreshToken };
+  } catch (error) {
+    throw new ApiError(
+      "Some thing went wrong during access and refresh token generation!",
+      500,
+      error
+    );
+  }
+};
+
 const registerUser = asyncHandler(async (req, res) => {
   //1- getting user details
   const { username, email, fullName, password } = req.body;
@@ -71,11 +88,59 @@ const registerUser = asyncHandler(async (req, res) => {
 const loginUser = asyncHandler(async (req, res) => {
   //1) geting data from user for authentication
   const { username, email, password } = req.body;
+
+  // 2) login based on username or email
   if (username.trim() === "" && email.trim() === "") {
     throw new ApiError("username or email is must required for login", 400);
   }
+  // 3)checking if User already exists or not
+  const existedUser = await User.findOne({
+    $or: [{ username }, { email }],
+  });
 
-  return res.status(201).send("Okay hogya");
+  if (!existedUser) {
+    throw new ApiError(
+      "User not found, please try again with coreect email or username",
+      404
+    );
+  }
+  // 4) if user is found then checking password
+  const checkPassord = await existedUser.isPasswordCorrect(password);
+  if (checkPassord === false) {
+    throw new ApiError("Password is incorrect, Try again!", 400);
+  }
+  //5) if password is correct then generate access and refresh token + save refreshToken inside db/user object and
+  // return both access and refresh token so that we can send it to user through secure cookies
+  const { AccessToken, RefreshToken } = await generateAccessAndRefreshToken(
+    existedUser._id
+  );
+
+  //calling database again to get updated/authenticated user with refresh token  & then removing password & RT.
+  const LoggedInUser = await User.findById(existedUser._id).select(
+    "-password -refreshToken"
+  );
+
+  const options = {
+    httpOnly: true, //by default anyone can modifies our cookies in frontend, but when we set these 2 fields true
+    secure: true, //then cookies can only be modified from server.
+  };
+
+  // 6) Giving Access and Refresh Token to user securely through cookies + returning response with data
+  return res
+    .status(200)
+    .cookie("accessToken", AccessToken, options)
+    .cookie("refreshToken", RefreshToken, options)
+    .json(
+      new ApiResponse(
+        200,
+        {
+          user: LoggedInUser,
+          AccessToken,
+          RefreshToken,
+        },
+        "User Successfully login! "
+      )
+    );
 });
 
 export { registerUser, loginUser };
