@@ -105,12 +105,12 @@ const loginUser = asyncHandler(async (req, res) => {
     );
   }
   // 4) if user is found then checking password
-  const checkPassord = await existedUser.isPasswordCorrect(password);
+  const checkPassord = await existedUser.isPasswordCorrect(password); //method defined in User model
   if (checkPassord === false) {
     throw new ApiError("Password is incorrect, Try again!", 400);
   }
-  //5) if password is correct then generate access and refresh token + save refreshToken inside db/user object and
-  // return both access and refresh token so that we can send it to user through secure cookies
+  //5) if password is correct then generate access and refresh token + save refreshToken inside db through user object and
+  // return both access and refresh token so that we can send it to user.
   const { AccessToken, RefreshToken } = await generateAccessAndRefreshToken(
     existedUser._id
   );
@@ -143,4 +143,33 @@ const loginUser = asyncHandler(async (req, res) => {
     );
 });
 
-export { registerUser, loginUser };
+const logoutUser = asyncHandler(async (req, res) => {
+  // way#1
+  // const user = req.user;
+  // user.refreshToken = undefined;
+  // const updatedUser = await user.save();
+
+  // way#2
+  await User.findByIdAndUpdate(
+    req.user._id,
+    {
+      $unset: { refreshToken: "" },
+    },
+    {
+      new: true, // Get the updated document
+    }
+  );
+
+  const options = {
+    httpOnly: true,
+    secure: true,
+  };
+
+  return res
+    .status(200)
+    .clearCookie("accessToken", options)
+    .clearCookie("refreshToken", options)
+    .json(new ApiResponse(200, null, "Logged out successfully"));
+});
+
+export { registerUser, loginUser, logoutUser };
