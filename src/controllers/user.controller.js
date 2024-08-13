@@ -218,7 +218,7 @@ const refreshAcessToken = asyncHandler(async (req, res) => {
 
 const changePassword = asyncHandler(async (req, res) => {
   const { currentPassword, newPassword } = req.body;
-  if (currentPassword.trim()=== "" || newPassword.trim()=== "") {
+  if (currentPassword.trim() === "" || newPassword.trim() === "") {
     throw new ApiError("Must enter current and new password! ", 401);
   }
   const user = req.user; //getting user through authentication middleware
@@ -239,12 +239,33 @@ const changePassword = asyncHandler(async (req, res) => {
     .json(new ApiResponse(201, null, "Password changed Successfully!"));
 });
 
-const getCurrentUser = asyncHandler( async (req,res) => {
+const getCurrentUser = asyncHandler(async (req, res) => {
   const user = req.user;
-  return res. json(
-    new ApiResponse (200, user, "Successfully got current user!")
-  )
-})
+  return res.json(new ApiResponse(200, user, "Successfully got current user!"));
+});
+
+const updateAccountDetails = asyncHandler(async (req, res) => {
+  const { fullName, email } = req.body;
+
+  if (fullName.trim() === "" && email.trim() === "") {
+    throw new ApiError(
+      "Email or fullname is must required for updating account details!", 400
+    );
+  }
+
+  const user = req.user;
+
+  if (fullName) {
+    user.fullName = fullName;
+    await user.save();
+  }
+  if (email) {
+    user.email = email;
+    await user.save();
+  }
+
+  res.json(new ApiResponse(200, user, "Account details updated successfully!"));
+});
 
 export {
   registerUser,
@@ -252,5 +273,6 @@ export {
   logoutUser,
   refreshAcessToken,
   changePassword,
-  getCurrentUser
+  getCurrentUser,
+  updateAccountDetails,
 };
