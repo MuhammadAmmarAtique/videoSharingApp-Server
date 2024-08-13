@@ -216,4 +216,33 @@ const refreshAcessToken = asyncHandler(async (req, res) => {
     );
 });
 
-export { registerUser, loginUser, logoutUser, refreshAcessToken };
+const changePassword = asyncHandler(async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+  if (currentPassword.trim()=== "" || newPassword.trim()=== "") {
+    throw new ApiError("Must enter current and new password! ", 401);
+  }
+  const user = req.user; //getting user through authentication middleware
+  const result = await user.isPasswordCorrect(currentPassword);
+
+  if (result === false) {
+    throw new ApiError(
+      "Incorrect current password! cannot change password! ",
+      401
+    );
+  }
+
+  user.password = newPassword; //password hashing is doing inside User model before saving
+  await user.save();
+
+  return res
+    .status(200)
+    .json(new ApiResponse(201, null, "Password changed Successfully!"));
+});
+
+export {
+  registerUser,
+  loginUser,
+  logoutUser,
+  refreshAcessToken,
+  changePassword,
+};
