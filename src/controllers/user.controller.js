@@ -2,6 +2,7 @@ import { ApiError } from "../utils/ApiError.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import { User } from "../models/user.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import { deleteFromCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jsonwebtoken from "jsonwebtoken";
 
@@ -68,7 +69,9 @@ const registerUser = asyncHandler(async (req, res) => {
     fullName,
     password,
     avatar: uploadedAvatar.url,
+    avatarPublicId: uploadedAvatar.public_id,
     coverImage: uploadedCoverImg?.url || "",
+    coverImagePublicId: uploadedCoverImg?.public_id || "",
   });
 
   // 7+8- checking if User is created in db and removing password and refresh token from it
@@ -249,7 +252,8 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
 
   if (fullName.trim() === "" && email.trim() === "") {
     throw new ApiError(
-      "Email or fullname is must required for updating account details!", 400
+      "Email or fullname is must required for updating account details!",
+      400
     );
   }
 
@@ -267,6 +271,81 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
   res.json(new ApiResponse(200, user, "Account details updated successfully!"));
 });
 
+const updateUserAvatarImg = asyncHandler(async (req, res) => {
+  // 1) Ensure the user is logged in
+  const user = req.user;
+  console.log("before::::::;;: ", user);
+
+  if (!user) {
+    throw new ApiError(
+      "Authentication failed! Login is must required for Avatar image update!",
+      401
+    );
+  }
+  // 2) Get the new image through the multer middleware
+  const avatarLocalPath = req.file?.path;
+
+  if (!avatarLocalPath) {
+    throw new ApiError("Must provide image!", 400);
+  }
+  // 3) Upload the new image to Cloudinary
+  const uploadedAvatar = await uploadOnCloudinary(avatarLocalPath);
+
+  if (!uploadedAvatar.url) {
+    throw new ApiError("Problem during Avatar image Upload!", 406);
+  }
+  // 4) Delete the old image from Cloudinary (if exists)
+  if (user.avatarPublicId) {
+    await deleteFromCloudinary(user.avatarPublicId);
+  }
+  // 5) Update user's avatar URL and public_id, then save
+  user.avatar = uploadedAvatar.url;
+  user.avatarPublicId = uploadedAvatar.public_id; // Save the new public_id
+  await user.save();
+  console.log("after::::::: ", user);
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, {}, "Successfully updated avatar Image"));
+});
+
+const updateUserCoverImg = asyncHandler(async (req, res) => {
+  const user = req.user;
+  console.log("before::::::;;: ", user);
+
+  if (!user) {
+    throw new ApiError(
+      "Authentication failed! Login is must required for Avatar image update!",
+      401
+    );
+  }
+
+  const coverImageLocalPath = req.file?.path;
+
+  if (!coverImageLocalPath) {
+    throw new ApiError("Must provide image!", 400);
+  }
+
+  const uploadedCoverImg = await uploadOnCloudinary(coverImageLocalPath);
+
+  if (!uploadedCoverImg.url) {
+    throw new ApiError("Problem during Cover image Upload!", 406);
+  }
+
+  if (user.coverImagePublicId) {
+    await deleteFromCloudinary(user.coverImagePublicId);
+  }
+
+  user.coverImage = uploadedCoverImg.url;
+  user.coverImagePublicId = uploadedAvatar.public_id;
+  await user.save();
+  console.log("after::::::: ", user);
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, {}, "Successfully updated Cover Image"));
+});
+
 export {
   registerUser,
   loginUser,
@@ -275,4 +354,6 @@ export {
   changePassword,
   getCurrentUser,
   updateAccountDetails,
+  updateUserAvatarImg,
+  updateUserCoverImg,
 };
