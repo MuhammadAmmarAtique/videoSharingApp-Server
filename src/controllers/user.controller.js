@@ -274,7 +274,6 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
 const updateUserAvatarImg = asyncHandler(async (req, res) => {
   // 1) Ensure the user is logged in
   const user = req.user;
-  console.log("before::::::;;: ", user);
 
   if (!user) {
     throw new ApiError(
@@ -302,7 +301,6 @@ const updateUserAvatarImg = asyncHandler(async (req, res) => {
   user.avatar = uploadedAvatar.url;
   user.avatarPublicId = uploadedAvatar.public_id; // Save the new public_id
   await user.save();
-  console.log("after::::::: ", user);
 
   res
     .status(200)
@@ -311,7 +309,6 @@ const updateUserAvatarImg = asyncHandler(async (req, res) => {
 
 const updateUserCoverImg = asyncHandler(async (req, res) => {
   const user = req.user;
-  console.log("before::::::;;: ", user);
 
   if (!user) {
     throw new ApiError(
@@ -337,9 +334,8 @@ const updateUserCoverImg = asyncHandler(async (req, res) => {
   }
 
   user.coverImage = uploadedCoverImg.url;
-  user.coverImagePublicId = uploadedAvatar.public_id;
+  user.coverImagePublicId = uploadedCoverImg.public_id;
   await user.save();
-  console.log("after::::::: ", user);
 
   res
     .status(200)
