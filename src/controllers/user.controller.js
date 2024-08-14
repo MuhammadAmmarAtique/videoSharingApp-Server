@@ -70,8 +70,8 @@ const registerUser = asyncHandler(async (req, res) => {
     password,
     avatar: uploadedAvatar.url,
     avatarPublicId: uploadedAvatar.public_id,
-    coverImage: uploadedCoverImg?.url || "",
-    coverImagePublicId: uploadedCoverImg?.public_id || "",
+    coverImage: uploadedCoverImg?.url,
+    coverImagePublicId: uploadedCoverImg?.public_id,
   });
 
   // 7+8- checking if User is created in db and removing password and refresh token from it
