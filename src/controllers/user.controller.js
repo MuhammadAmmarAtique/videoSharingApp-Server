@@ -6,6 +6,7 @@ import { deleteFromCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jsonwebtoken from "jsonwebtoken";
 
+// generateAccessAndRefreshToken method will be used for login & refreshing access token.
 const generateAccessAndRefreshToken = async (userId) => {
   try {
     const user = await User.findById(userId);
