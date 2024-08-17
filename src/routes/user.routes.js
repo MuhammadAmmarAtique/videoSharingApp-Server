@@ -10,7 +10,8 @@ import {
   getCurrentUser,
   updateAccountDetails,
   updateUserAvatarImg,
-  updateUserCoverImg
+  updateUserCoverImg,
+  getUserChannelProfile
 } from "../controllers/user.controller.js";
 
 const userRouter = Router();
@@ -44,5 +45,6 @@ userRouter.route("/update-User-CoverImg").post(
   verifyJWT,
   updateUserCoverImg
 )
+userRouter.route("/:username").post(verifyJWT,getUserChannelProfile);
 
 export default userRouter;

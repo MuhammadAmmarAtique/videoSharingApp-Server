@@ -343,6 +343,90 @@ const updateUserCoverImg = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, {}, "Successfully updated Cover Image"));
 });
 
+const getUserChannelProfile = asyncHandler(async (req, res) => {
+  const { username } = req.params;
+
+  if (!username?.trim()) {
+    throw new ApiError("Error in getting Username from url", 400);
+  }
+
+  //way#1 of finding User
+  // const user = await User.findOne({username})
+  // console.log("user: ", user);
+
+  const getUserChannelProfile = await User.aggregate([
+    //stage 1 (way#2 of finding User/ we know that User is "Channel" also)
+    {
+      $match: {
+        //match operator will find that user object whose username matched with one we are getting from url
+        username: username?.toLowerCase(),
+      },
+    },
+    // stage 2  (Finding our channel/User "subscribers")
+    {
+      $lookup: {
+        //Here lookup operator join our user object with subscription object
+        from: "subscriptions",
+        localField: "_id", // lets suppose our channel is "chai-aur-code", it has unique id.
+        foreignField: "channel", //above id will be matched to channel field id & we will get our channel subscribers
+        as: "subscribers",
+      },
+    },
+    // stage 3 (Finding to whom our channel/User "subscribed")
+    {
+      $lookup: {
+        from: "subscriptions",
+        localField: "_id",
+        foreignField: "subscriber",
+        as: "subscribedTo",
+      },
+    },
+    // stage 4 (Adding field in our Channel/User b/c in stage 2 & stage 4 we got only objects)
+    {
+      $addFields: {
+        subcribersCount: {
+          $size: "$subscribers", //size operator will count all the objects inside subscribers Array
+        },
+        channelSubscribedToCount: {
+          $size: "$subscribedTo",
+        },
+        isSubscribed: {
+          $cond: {
+            if: { $in: [req.user?._id, "$subscribers.subscriber"] },
+            then: true,
+            else: false,
+          },
+        },
+      },
+    },
+    // stage 5 (using $project operator to send necessary files in frontend, so it can be displayed in UI)
+    {
+      $project:{
+        username:1,
+        email:1,
+        fullName:1,
+        avatar:1,
+        coverImage:1,
+        subcribersCount:1,
+        channelSubscribedToCount:1,
+        isSubscribed:1
+      }
+    }
+  ]);
+
+  //**IMP**// comment every pipeline and see output of every pipeline what it does!
+  // console.log("getUserChannelProfile:", getUserChannelProfile); 
+
+  if (!getUserChannelProfile?.length) {
+    throw new ApiError("Channel doesnot exists", 400)
+  }
+
+  res.status(200)
+  .json(
+    new ApiResponse(200,getUserChannelProfile[0],"Channel fetched successfully!" )
+  )
+});
+
 export {
   registerUser,
   loginUser,
@@ -353,4 +437,5 @@ export {
   updateAccountDetails,
   updateUserAvatarImg,
   updateUserCoverImg,
+  getUserChannelProfile,
 };
