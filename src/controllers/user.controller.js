@@ -159,7 +159,7 @@ const logoutUser = asyncHandler(async (req, res) => {
   await User.findByIdAndUpdate(
     req.user._id,
     {
-      $unset: { refreshToken: "" },
+      $unset: { refreshToken: 1 }, // 1 flag will remove the field from our document
     },
     {
       new: true, // Get the updated document
@@ -483,10 +483,15 @@ const getUserWatchHistroy = asyncHandler(async (req, res) => {
   ]);
   console.log(UserWatchHistroy);
 
- return res.status(200)
-           .json(
-            new ApiResponse(200,UserWatchHistroy[0] ,"User watched histroy fetched Successfully!")
-           )
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        UserWatchHistroy[0],
+        "User watched histroy fetched Successfully!"
+      )
+    );
 });
 
 export {
