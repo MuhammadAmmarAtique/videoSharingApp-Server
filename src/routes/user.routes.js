@@ -11,7 +11,8 @@ import {
   updateAccountDetails,
   updateUserAvatarImg,
   updateUserCoverImg,
-  getUserChannelProfile
+  getUserChannelProfile,
+  getUserWatchHistroy
 } from "../controllers/user.controller.js";
 
 const userRouter = Router();
@@ -45,6 +46,7 @@ userRouter.route("/update-User-CoverImg").post(
   verifyJWT,
   updateUserCoverImg
 )
+userRouter.route("/get-User-Watch-Histroy").post(verifyJWT,getUserWatchHistroy);
 userRouter.route("/:username").post(verifyJWT,getUserChannelProfile);
 
 export default userRouter;

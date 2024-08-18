@@ -5,6 +5,7 @@ import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { deleteFromCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jsonwebtoken from "jsonwebtoken";
+import { mongoose } from "mongoose";
 
 // generateAccessAndRefreshToken method will be used for login & refreshing access token.
 const generateAccessAndRefreshToken = async (userId) => {
@@ -401,30 +402,91 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
     },
     // stage 5 (using $project operator to send necessary files in frontend, so it can be displayed in UI)
     {
-      $project:{
-        username:1,
-        email:1,
-        fullName:1,
-        avatar:1,
-        coverImage:1,
-        subcribersCount:1,
-        channelSubscribedToCount:1,
-        isSubscribed:1
-      }
-    }
+      $project: {
+        username: 1,
+        email: 1,
+        fullName: 1,
+        avatar: 1,
+        coverImage: 1,
+        subcribersCount: 1,
+        channelSubscribedToCount: 1,
+        isSubscribed: 1,
+      },
+    },
   ]);
 
   //**IMP**// comment every pipeline and see output of every pipeline what it does!
-  // console.log("getUserChannelProfile:", getUserChannelProfile); 
+  // console.log("getUserChannelProfile:", getUserChannelProfile);
 
   if (!getUserChannelProfile?.length) {
-    throw new ApiError("Channel doesnot exists", 400)
+    throw new ApiError("Channel doesnot exists", 400);
   }
 
-  res.status(200)
-  .json(
-    new ApiResponse(200,getUserChannelProfile[0],"Channel fetched successfully!" )
-  )
+  res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        getUserChannelProfile[0],
+        "Channel fetched successfully!"
+      )
+    );
+});
+
+const getUserWatchHistroy = asyncHandler(async (req, res) => {
+  const UserWatchHistroy = await User.aggregate([
+    // stage 1 (getting User)
+    {
+      $match: {
+        _id: new mongoose.Types.ObjectId(req.user._id),
+        // _id:  req.user._id
+      },
+    },
+    // stage 2 (getting all videos User has watched) (its Pipeline with subPipelines)
+    {
+      $lookup: {
+        from: "videos",
+        localField: "watchHistory",
+        foreignField: "_id",
+        as: "watchHistory",
+        // subpipeline (to add owner field inside videos)
+        pipeline: [
+          {
+            $lookup: {
+              from: "users",
+              localField: "owner",
+              foreignField: "_id",
+              as: "owner",
+              // sub-sub pipeline (to send only necessary data of user inside owner field)
+              pipeline: [
+                {
+                  $project: {
+                    username: 1,
+                    fullName: 1,
+                    avatar: 1,
+                  },
+                },
+              ],
+            },
+          },
+          //when above work is done sending object back, instead of Array of object.
+          {
+            $addFields: {
+              owner: {
+                $first: "$owner",
+              },
+            },
+          },
+        ],
+      },
+    },
+  ]);
+  console.log(UserWatchHistroy);
+
+ return res.status(200)
+           .json(
+            new ApiResponse(200,UserWatchHistroy[0] ,"User watched histroy fetched Successfully!")
+           )
 });
 
 export {
@@ -438,4 +500,5 @@ export {
   updateUserAvatarImg,
   updateUserCoverImg,
   getUserChannelProfile,
+  getUserWatchHistroy,
 };
