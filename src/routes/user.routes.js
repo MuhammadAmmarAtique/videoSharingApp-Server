@@ -12,7 +12,7 @@ import {
   updateUserAvatarImg,
   updateUserCoverImg,
   getUserChannelProfile,
-  getUserWatchHistroy
+  getUserWatchHistroy,
 } from "../controllers/user.controller.js";
 
 const userRouter = Router();
@@ -31,22 +31,20 @@ userRouter.route("/register").post(
   registerUser
 );
 userRouter.route("/login").post(loginUser);
-userRouter.route("/logout").post(verifyJWT, logoutUser);
+userRouter.route("/logout").get(verifyJWT, logoutUser);
 userRouter.route("/refresh-Token").post(refreshAcessToken);
 userRouter.route("/change-Password").post(verifyJWT, changePassword);
-userRouter.route("/get-current-User").post(verifyJWT, getCurrentUser);
-userRouter.route("/update-Account-Details").post(verifyJWT, updateAccountDetails);
-userRouter.route("/update-User-AvatarImg").post(
-  upload.single("avatar"),
-  verifyJWT,
-  updateUserAvatarImg
-)
-userRouter.route("/update-User-CoverImg").post(
-  upload.single("coverImage"),
-  verifyJWT,
-  updateUserCoverImg
-)
-userRouter.route("/get-User-Watch-Histroy").post(verifyJWT,getUserWatchHistroy);
-userRouter.route("/:username").post(verifyJWT,getUserChannelProfile);
+userRouter.route("/get-current-User").get(verifyJWT, getCurrentUser);
+userRouter
+  .route("/update-Account-Details")
+  .patch(verifyJWT, updateAccountDetails);
+userRouter
+  .route("/update-User-AvatarImg")
+  .patch(verifyJWT, upload.single("avatar"), updateUserAvatarImg);
+userRouter
+  .route("/update-User-CoverImg")
+  .patch(verifyJWT, upload.single("coverImage"), updateUserCoverImg);
+userRouter.route("/c/:username").get(verifyJWT, getUserChannelProfile);
+userRouter.route("/get-User-Watch-Histroy").get(verifyJWT, getUserWatchHistroy);
 
 export default userRouter;
