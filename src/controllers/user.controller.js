@@ -244,22 +244,24 @@ const forgetPassword = asyncHandler(async (req, res) => {
   }
 
   // 2) Generating a reset token
-  const resetToken = jsonwebtoken.sign({ userId: user._id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_RESET_EXPIRATION,
-  });
+  const resetToken = jsonwebtoken.sign(
+    { userId: user._id },
+    process.env.JWT_SECRET,
+    {
+      expiresIn: process.env.JWT_RESET_EXPIRATION,
+    }
+  );
   console.log("resetToken: ", resetToken);
 
-  // 3) Send reset token via email
+  // 3) Sending reset token via from our email to user email
   const transporter = nodemailer.createTransport({
-    service: "Gmail", 
+    service: "Gmail",
     auth: {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASS,
     },
   });
-  
-  console.log("process.env.EMAIL_PASS: ", process.env.EMAIL_PASS);
-  console.log("transporter: ", transporter);
+
   const mailOptions = {
     from: "noreply@example.com",
     to: user.email,
@@ -267,12 +269,16 @@ const forgetPassword = asyncHandler(async (req, res) => {
     text: `You requested a password reset. Please use the following token to reset your password: ${resetToken}`,
   };
 
-  const transporterResponse = await transporter.sendMail(mailOptions);
-  console.log("transporterResponse: ", transporterResponse);
-
+  await transporter.sendMail(mailOptions);
   res
     .status(200)
-    .json(new ApiResponse(200, {}, "Password reset token successfully sent to your gmail Account!"));
+    .json(
+      new ApiResponse(
+        200,
+        {},
+        "Password reset token successfully sent to your gmail Account!"
+      )
+    );
 });
 
 const resetPassword = asyncHandler(async (req, res) => {
