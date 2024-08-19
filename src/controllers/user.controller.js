@@ -6,6 +6,8 @@ import { deleteFromCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jsonwebtoken from "jsonwebtoken";
 import { mongoose } from "mongoose";
+import bcrypt from "bcrypt";
+import nodemailer from "nodemailer";
 
 // generateAccessAndRefreshToken method will be used for login & refreshing access token.
 const generateAccessAndRefreshToken = async (userId) => {
@@ -233,21 +235,51 @@ const changePassword = asyncHandler(async (req, res) => {
     .json(new ApiResponse(201, null, "Password changed Successfully!"));
 });
 
-const forgetPassword = asyncHandler(async (req,res) => {
-  // user has email or username but forget its password
-  // check username or email exist in our database, if not give error
-  // if user found, continue next steps
+const forgetPassword = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+  //1) Check if user exists
+  const user = await User.findOne({ email });
+  if (!user) {
+    throw new ApiError("User not found! ", 404);
+  }
 
-  const {name} = req.body
-  console.log("name: ", name);
-  res.send("working on forget password functionality!")
-})
+  // 2) Generating a reset token
+  const resetToken = jsonwebtoken.sign({ userId: user._id }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_RESET_EXPIRATION,
+  });
+  console.log("resetToken: ", resetToken);
 
-const resetPassword = asyncHandler(async (req,res) => {
-  const {name} = req.body
+  // 3) Send reset token via email
+  const transporter = nodemailer.createTransport({
+    service: "Gmail", 
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+  });
+  
+  console.log("process.env.EMAIL_PASS: ", process.env.EMAIL_PASS);
+  console.log("transporter: ", transporter);
+  const mailOptions = {
+    from: "noreply@example.com",
+    to: user.email,
+    subject: "Password Reset",
+    text: `You requested a password reset. Please use the following token to reset your password: ${resetToken}`,
+  };
+
+  const transporterResponse = await transporter.sendMail(mailOptions);
+  console.log("transporterResponse: ", transporterResponse);
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, {}, "Password reset token successfully sent to your gmail Account!"));
+});
+
+const resetPassword = asyncHandler(async (req, res) => {
+  const { name } = req.body;
   console.log("name: ", name);
-  res.send("working on reset password functionality!")
-})
+  res.send("working on reset password functionality!");
+});
 
 const getCurrentUser = asyncHandler(async (req, res) => {
   const user = req.user;
