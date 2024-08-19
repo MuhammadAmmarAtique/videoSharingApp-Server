@@ -25,6 +25,12 @@ const generateAccessAndRefreshToken = async (userId) => {
   }
 };
 
+//cookies options to be used in login,logout,refreshAcessToken & deleteUser.
+const options = {
+  httpOnly: true, //by default anyone can modifies our cookies in frontend, but when we set these 2 fields true
+  secure: true, //then cookies can only be modified from server.
+};
+
 const registerUser = asyncHandler(async (req, res) => {
   //1- getting user details
   const { username, email, fullName, password } = req.body;
@@ -104,7 +110,7 @@ const loginUser = asyncHandler(async (req, res) => {
 
   if (!existedUser) {
     throw new ApiError(
-      "User not found, please try again with coreect email or username",
+      "User not found, please try again with correct email or username",
       404
     );
   }
@@ -123,11 +129,6 @@ const loginUser = asyncHandler(async (req, res) => {
   const LoggedInUser = await User.findById(existedUser._id).select(
     "-password -refreshToken"
   );
-
-  const options = {
-    httpOnly: true, //by default anyone can modifies our cookies in frontend, but when we set these 2 fields true
-    secure: true, //then cookies can only be modified from server.
-  };
 
   // 6) Giving Access and Refresh Token to user securely through cookies + returning response with data
   return res
@@ -164,11 +165,6 @@ const logoutUser = asyncHandler(async (req, res) => {
     }
   );
 
-  const options = {
-    httpOnly: true,
-    secure: true,
-  };
-
   return res
     .status(200)
     .clearCookie("accessToken", options)
@@ -198,11 +194,6 @@ const refreshAcessToken = asyncHandler(async (req, res) => {
   const { AccessToken, RefreshToken } = await generateAccessAndRefreshToken(
     user._id
   );
-
-  const options = {
-    httpOnly: true,
-    secure: true,
-  };
 
   res
     .cookie("accessToken", AccessToken, options)
@@ -555,10 +546,7 @@ const deleteUser = asyncHandler(async (req, res) => {
     const coverPublicId = extractPublicIdFromUrl(coverImg);
     await deleteFromCloudinary(coverPublicId);
   }
-  const options = {
-    httpOnly: true,
-    secure: true,
-  };
+
   return res
     .status(200)
     .clearCookie("accessToken", options)
