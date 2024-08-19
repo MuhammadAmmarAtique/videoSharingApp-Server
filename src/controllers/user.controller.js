@@ -233,6 +233,22 @@ const changePassword = asyncHandler(async (req, res) => {
     .json(new ApiResponse(201, null, "Password changed Successfully!"));
 });
 
+const forgetPassword = asyncHandler(async (req,res) => {
+  // user has email or username but forget its password
+  // check username or email exist in our database, if not give error
+  // if user found, continue next steps
+
+  const {name} = req.body
+  console.log("name: ", name);
+  res.send("working on forget password functionality!")
+})
+
+const resetPassword = asyncHandler(async (req,res) => {
+  const {name} = req.body
+  console.log("name: ", name);
+  res.send("working on reset password functionality!")
+})
+
 const getCurrentUser = asyncHandler(async (req, res) => {
   const user = req.user;
   return res.json(new ApiResponse(200, user, "Successfully got current user!"));
@@ -560,6 +576,8 @@ export {
   logoutUser,
   refreshAcessToken,
   changePassword,
+  forgetPassword,
+  resetPassword,
   getCurrentUser,
   updateAccountDetails,
   updateUserAvatarImg,

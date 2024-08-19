@@ -7,6 +7,8 @@ import {
   logoutUser,
   refreshAcessToken,
   changePassword,
+  forgetPassword,
+  resetPassword,
   getCurrentUser,
   updateAccountDetails,
   updateUserAvatarImg,
@@ -35,6 +37,8 @@ userRouter.route("/login").post(loginUser);
 userRouter.route("/logout").post(verifyJWT, logoutUser);
 userRouter.route("/refresh-Token").post(refreshAcessToken);
 userRouter.route("/change-Password").post(verifyJWT, changePassword);
+userRouter.route("/forget-Password").post(forgetPassword);
+userRouter.route("/reset-Password").post(resetPassword);
 userRouter.route("/get-current-User").get(verifyJWT, getCurrentUser);
 userRouter
   .route("/update-Account-Details")
@@ -47,6 +51,6 @@ userRouter
   .patch(verifyJWT, upload.single("coverImage"), updateUserCoverImg);
 userRouter.route("/c/:username").get(verifyJWT, getUserChannelProfile);
 userRouter.route("/get-User-Watch-Histroy").get(verifyJWT, getUserWatchHistroy);
-userRouter.route("/delete-User").delete(verifyJWT,deleteUser)
+userRouter.route("/delete-User").delete(verifyJWT,deleteUser);
 
 export default userRouter;
