@@ -30,7 +30,7 @@ const deleteFromCloudinary = async (publicId) => {
   try {
     if (!publicId) return null;
     await cloudinary.uploader.destroy(publicId);
-    console.log("Successfully deleted old image from Cloudinary! ");
+    console.log("Successfully deleted File from Cloudinary! ");
   } catch (error) {
     console.log(
       "Old image deletion failed on Cloudinary during new image update! ",

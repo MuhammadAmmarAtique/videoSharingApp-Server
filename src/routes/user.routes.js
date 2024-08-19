@@ -13,6 +13,7 @@ import {
   updateUserCoverImg,
   getUserChannelProfile,
   getUserWatchHistroy,
+  deleteUser
 } from "../controllers/user.controller.js";
 
 const userRouter = Router();
@@ -46,5 +47,6 @@ userRouter
   .patch(verifyJWT, upload.single("coverImage"), updateUserCoverImg);
 userRouter.route("/c/:username").get(verifyJWT, getUserChannelProfile);
 userRouter.route("/get-User-Watch-Histroy").get(verifyJWT, getUserWatchHistroy);
+userRouter.route("/delete-User").delete(verifyJWT,deleteUser)
 
 export default userRouter;

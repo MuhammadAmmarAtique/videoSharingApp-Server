@@ -71,9 +71,7 @@ const registerUser = asyncHandler(async (req, res) => {
     fullName,
     password,
     avatar: uploadedAvatar.url,
-    avatarPublicId: uploadedAvatar.public_id,
     coverImage: uploadedCoverImg?.url,
-    coverImagePublicId: uploadedCoverImg?.public_id,
   });
 
   // 7+8- checking if User is created in db and removing password and refresh token from it
@@ -283,6 +281,8 @@ const updateUserAvatarImg = asyncHandler(async (req, res) => {
       401
     );
   }
+  //old image to be deleted after successful new img successful upload
+  const oldAvatar = user.avatar;
   // 2) Get the new image through the multer middleware
   const avatarLocalPath = req.file?.path;
 
@@ -295,14 +295,27 @@ const updateUserAvatarImg = asyncHandler(async (req, res) => {
   if (!uploadedAvatar.url) {
     throw new ApiError("Problem during Avatar image Upload!", 406);
   }
-  // 4) Delete the old image from Cloudinary (if exists)
-  if (user.avatarPublicId) {
-    await deleteFromCloudinary(user.avatarPublicId);
-  }
-  // 5) Update user's avatar URL and public_id, then save
+
+  // 4) Update user's avatar URL  then save
   user.avatar = uploadedAvatar.url;
-  user.avatarPublicId = uploadedAvatar.public_id; // Save the new public_id
   await user.save();
+
+  // 5) Delete the old image from Cloudinary after user is updated
+  function extractPublicIdFromUrl(url) {
+    // Extract the substring after the last '/'
+    const publicIdWithExtension = url.substring(url.lastIndexOf("/") + 1);
+
+    // Remove the file extension (e.g., .jpg)
+    const publicId = publicIdWithExtension.split(".")[0];
+
+    return publicId;
+  }
+
+  const OldavatarPublicId = extractPublicIdFromUrl(oldAvatar);
+
+  if (OldavatarPublicId) {
+    await deleteFromCloudinary(OldavatarPublicId);
+  }
 
   res
     .status(200)
@@ -310,21 +323,25 @@ const updateUserAvatarImg = asyncHandler(async (req, res) => {
 });
 
 const updateUserCoverImg = asyncHandler(async (req, res) => {
+  // 1) Ensure the user is logged in
   const user = req.user;
 
   if (!user) {
     throw new ApiError(
-      "Authentication failed! Login is must required for Avatar image update!",
+      "Authentication failed! Login is must required for Cover image update!",
       401
     );
   }
+  //old image to be deleted after successful new img successful upload
+  const oldCover = user.coverImage;
 
+  // 2) Get the new image through the multer middleware
   const coverImageLocalPath = req.file?.path;
 
   if (!coverImageLocalPath) {
     throw new ApiError("Must provide image!", 400);
   }
-
+  // 3) Upload the new image to Cloudinary
   const uploadedCoverImg = await uploadOnCloudinary(coverImageLocalPath);
 
   if (!uploadedCoverImg.url) {
@@ -334,10 +351,25 @@ const updateUserCoverImg = asyncHandler(async (req, res) => {
   if (user.coverImagePublicId) {
     await deleteFromCloudinary(user.coverImagePublicId);
   }
-
+  // 4) Update user's cover URL  then save
   user.coverImage = uploadedCoverImg.url;
-  user.coverImagePublicId = uploadedCoverImg.public_id;
   await user.save();
+
+  // 5) Delete the old image from Cloudinary after user is updated
+  function extractPublicIdFromUrl(url) {
+    // Extract the substring after the last '/'
+    const publicIdWithExtension = url.substring(url.lastIndexOf("/") + 1);
+
+    // Remove the file extension (e.g., .jpg)
+    const publicId = publicIdWithExtension.split(".")[0];
+
+    return publicId;
+  }
+
+  if (oldCover) {
+    const OldcoverPublicId = extractPublicIdFromUrl(oldCover);
+    await deleteFromCloudinary(OldcoverPublicId);
+  }
 
   res
     .status(200)
@@ -494,6 +526,46 @@ const getUserWatchHistroy = asyncHandler(async (req, res) => {
     );
 });
 
+const deleteUser = asyncHandler(async (req, res) => {
+  //Images to be deleted from cloudinary, after successful account deletion!
+  const user = req.user;
+  const avatarImg = user.avatar;
+  const coverImg = user.coverImage;
+
+  //deleting account
+  await User.findByIdAndDelete(req.user._id);
+
+  //deleting images after account deletion
+  function extractPublicIdFromUrl(url) {
+    // Extract the substring after the last '/'
+    const publicIdWithExtension = url.substring(url.lastIndexOf("/") + 1);
+
+    // Remove the file extension (e.g., .jpg)
+    const publicId = publicIdWithExtension.split(".")[0];
+
+    return publicId;
+  }
+
+  if (avatarImg) {
+    const avatarPublicId = extractPublicIdFromUrl(avatarImg);
+    await deleteFromCloudinary(avatarPublicId);
+  }
+
+  if (coverImg) {
+    const coverPublicId = extractPublicIdFromUrl(coverImg);
+    await deleteFromCloudinary(coverPublicId);
+  }
+  const options = {
+    httpOnly: true,
+    secure: true,
+  };
+  return res
+    .status(200)
+    .clearCookie("accessToken", options)
+    .clearCookie("refreshToken", options)
+    .json(new ApiResponse(200, null, "User Account deleted successfully!"));
+});
+
 export {
   registerUser,
   loginUser,
@@ -506,4 +578,5 @@ export {
   updateUserCoverImg,
   getUserChannelProfile,
   getUserWatchHistroy,
+  deleteUser,
 };
