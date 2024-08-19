@@ -245,13 +245,12 @@ const forgetPassword = asyncHandler(async (req, res) => {
 
   // 2) Generating a reset token
   const resetToken = jsonwebtoken.sign(
-    { userId: user._id },
+    { _id: user._id },
     process.env.JWT_SECRET,
     {
       expiresIn: process.env.JWT_RESET_EXPIRATION,
     }
   );
-  console.log("resetToken: ", resetToken);
 
   // 3) Sending reset token via from our email to user email
   const transporter = nodemailer.createTransport({
@@ -282,9 +281,41 @@ const forgetPassword = asyncHandler(async (req, res) => {
 });
 
 const resetPassword = asyncHandler(async (req, res) => {
-  const { name } = req.body;
-  console.log("name: ", name);
-  res.send("working on reset password functionality!");
+  const { newPassword, token } = req.body;
+  if (!newPassword?.trim() || !token?.trim()) {
+    throw new ApiError(
+      "Must enter both your newpassword and token you get from your email to reset your Account's Password!",
+      400
+    );
+  }
+
+  // 1) Verifying the reset token we sent to user via email and comparing it with the one we sent using our JWT_SECRET
+  let decodedTokenInfo = jsonwebtoken.verify(token, process.env.JWT_SECRET);
+  if (!decodedTokenInfo) {
+    throw new ApiError(
+      "Invalid token, Enter again! Add no extra spaces while entering!",
+      400
+    );
+  }
+  //2) Hash the new password
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+  
+  // 3) Finding and Updating User
+  const updatedUser = await User.findByIdAndUpdate(
+    decodedTokenInfo._id,
+    {
+      password: hashedPassword,
+    },
+    { new: true }
+  );
+  if (!updatedUser) {
+    throw new ApiError("Problem while updating user password!", 500);
+  }
+  console.log("updatedUser: ", updatedUser);
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, updatedUser, "Password reset successful"));
 });
 
 const getCurrentUser = asyncHandler(async (req, res) => {
