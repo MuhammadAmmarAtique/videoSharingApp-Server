@@ -299,7 +299,7 @@ const resetPassword = asyncHandler(async (req, res) => {
   }
   //2) Hash the new password
   const hashedPassword = await bcrypt.hash(newPassword, 10);
-  
+
   // 3) Finding and Updating User
   const updatedUser = await User.findByIdAndUpdate(
     decodedTokenInfo._id,
@@ -377,21 +377,7 @@ const updateUserAvatarImg = asyncHandler(async (req, res) => {
   await user.save();
 
   // 5) Delete the old image from Cloudinary after user is updated
-  function extractPublicIdFromUrl(url) {
-    // Extract the substring after the last '/'
-    const publicIdWithExtension = url.substring(url.lastIndexOf("/") + 1);
-
-    // Remove the file extension (e.g., .jpg)
-    const publicId = publicIdWithExtension.split(".")[0];
-
-    return publicId;
-  }
-
-  const OldavatarPublicId = extractPublicIdFromUrl(oldAvatar);
-
-  if (OldavatarPublicId) {
-    await deleteFromCloudinary(OldavatarPublicId);
-  }
+  await deleteFromCloudinary(oldAvatar);
 
   res
     .status(200)
@@ -432,19 +418,8 @@ const updateUserCoverImg = asyncHandler(async (req, res) => {
   await user.save();
 
   // 5) Delete the old image from Cloudinary after user is updated
-  function extractPublicIdFromUrl(url) {
-    // Extract the substring after the last '/'
-    const publicIdWithExtension = url.substring(url.lastIndexOf("/") + 1);
-
-    // Remove the file extension (e.g., .jpg)
-    const publicId = publicIdWithExtension.split(".")[0];
-
-    return publicId;
-  }
-
   if (oldCover) {
-    const OldcoverPublicId = extractPublicIdFromUrl(oldCover);
-    await deleteFromCloudinary(OldcoverPublicId);
+    await deleteFromCloudinary(oldCover);
   }
 
   res
@@ -612,24 +587,9 @@ const deleteUser = asyncHandler(async (req, res) => {
   await User.findByIdAndDelete(req.user._id);
 
   //deleting images after account deletion
-  function extractPublicIdFromUrl(url) {
-    // Extract the substring after the last '/'
-    const publicIdWithExtension = url.substring(url.lastIndexOf("/") + 1);
-
-    // Remove the file extension (e.g., .jpg)
-    const publicId = publicIdWithExtension.split(".")[0];
-
-    return publicId;
-  }
-
-  if (avatarImg) {
-    const avatarPublicId = extractPublicIdFromUrl(avatarImg);
-    await deleteFromCloudinary(avatarPublicId);
-  }
-
+  await deleteFromCloudinary(avatarImg);
   if (coverImg) {
-    const coverPublicId = extractPublicIdFromUrl(coverImg);
-    await deleteFromCloudinary(coverPublicId);
+    await deleteFromCloudinary(coverImg);
   }
 
   return res
