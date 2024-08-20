@@ -83,7 +83,7 @@ const getVideoById = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, video, "Video fetched Successfully!"));
 });
 
-const updateVideodetails = asyncHandler(async (req, res) => {
+const updateVideoDetails = asyncHandler(async (req, res) => {
   const { videoId } = req.params;
 
   if (!videoId) {
@@ -119,4 +119,4 @@ const updateVideodetails = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, video, "Video details updated successfully!"));
 });
 
-export { uploadVideo, getVideoById, updateVideodetails };
+export { uploadVideo, getVideoById, updateVideoDetails };
