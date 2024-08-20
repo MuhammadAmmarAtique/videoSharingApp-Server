@@ -26,14 +26,25 @@ const uploadOnCloudinary = async (filePath) => {
   }
 };
 
-const deleteFromCloudinary = async (publicId) => {
+const deleteFromCloudinary = async (fileUrl) => {
   try {
-    if (!publicId) return null;
-    await cloudinary.uploader.destroy(publicId);
+    function extractPublicIdFromUrl(url) {
+      // Extract the substring after the last '/'
+      const publicIdWithExtension = url.substring(url.lastIndexOf("/") + 1);
+      // Remove the file extension (e.g., .jpg, mp4)
+      const publicId = publicIdWithExtension.split(".")[0];
+      return publicId;
+    }
+    const filePublicId = extractPublicIdFromUrl(fileUrl);
+
+    if (!filePublicId) return null;
+    await cloudinary.uploader.destroy(filePublicId);
+
     console.log("Successfully deleted File from Cloudinary! ");
-  } catch (error) {
+  } 
+  catch (error) {
     console.log(
-      "Old image deletion failed on Cloudinary during new image update! ",
+      "File deletion from Cloudinary failed! ",
       error
     );
   }
