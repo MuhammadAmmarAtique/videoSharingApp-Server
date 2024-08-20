@@ -63,4 +63,24 @@ const uploadVideo = asyncHandler(async (req, res) => {
     );
 });
 
-export { uploadVideo };
+const getVideoById = asyncHandler(async (req, res) => {
+  const { videoId } = req.params;
+
+  if (!videoId) {
+    throw new ApiError("Problem in getting video id from url", 400);
+  }
+
+  const video = await Video.findById({
+    _id: videoId,
+  });
+
+  if (!video) {
+    throw new ApiError("Video is not found in database", 500);
+  }
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, video, "Video fetched Successfully!"));
+});
+
+export { uploadVideo, getVideoById };
