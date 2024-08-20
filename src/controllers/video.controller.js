@@ -83,4 +83,40 @@ const getVideoById = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, video, "Video fetched Successfully!"));
 });
 
-export { uploadVideo, getVideoById };
+const updateVideodetails = asyncHandler(async (req, res) => {
+  const { videoId } = req.params;
+
+  if (!videoId) {
+    throw new ApiError("Problem in getting video id from url", 400);
+  }
+
+  const { title, description } = req.body;
+
+  if (!title?.trim() && !description?.trim()) {
+    throw new ApiError(
+      "Must give  title or description to update video detials!",
+      400
+    );
+  }
+
+  const video = await Video.findById({ _id: videoId });
+  if (!video) {
+    throw new ApiError("Unable to find video in database", 500);
+  }
+
+  if (title) {
+    video.title = title;
+    await video.save();
+  }
+
+  if (description) {
+    video.description = description;
+    await video.save();
+  }
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, video, "Video details updated successfully!"));
+});
+
+export { uploadVideo, getVideoById, updateVideodetails };
