@@ -1,7 +1,10 @@
 import { Video } from "../models/video.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
-import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import {
+  deleteFromCloudinary,
+  uploadOnCloudinary,
+} from "../utils/cloudinary.js";
 import asyncHandler from "../utils/asyncHandler.js";
 
 const uploadVideo = asyncHandler(async (req, res) => {
@@ -119,4 +122,52 @@ const updateVideoDetails = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, video, "Video details updated successfully!"));
 });
 
-export { uploadVideo, getVideoById, updateVideoDetails };
+const updateVideoThumbnail = asyncHandler(async (req, res) => {
+  // 1) find video after getting video id from url
+  // 2) hold old thumbnail url in variable to delete it from cloudinary  after successful updation
+  // 3) get new thumbnail from user, store it temporarily in disk through multer then upload it in cloudinary
+  // 4) update document
+  // 5) delete old thumbnail
+  // 6) send response of successful thumbnail updation
+
+  // 1)
+  const { videoId } = req.params;
+
+  const video = await Video.findById({ _id: videoId });
+
+  if (!video) {
+    throw new ApiError(
+      "Problem in getting video from database, Wrong Videoid or video doesnot exist in db",
+      400
+    );
+  }
+  // 2)
+  const oldThumbnail = video.thumbnail;
+
+  // 3)
+  const newThumbnail = req.file?.path;
+
+  if (!newThumbnail) {
+    throw new ApiError("Must give new image to update thumbnail", 400);
+  }
+
+  const uploadedNewThumbnail = await uploadOnCloudinary(newThumbnail);
+
+  if (!uploadedNewThumbnail) {
+    throw new ApiError("Problem in uploading new thumbnail in cloudinary", 500);
+  }
+
+  // 4)
+  video.thumbnail = uploadedNewThumbnail.url;
+  await video.save();
+
+  // 5)
+  await deleteFromCloudinary(oldThumbnail);
+
+  // 6)
+  res
+    .status(200)
+    .json(new ApiResponse(200, video, "Thumbnail updated Successfully!"));
+});
+
+export { uploadVideo, getVideoById, updateVideoDetails, updateVideoThumbnail };
