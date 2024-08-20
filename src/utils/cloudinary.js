@@ -38,15 +38,21 @@ const deleteFromCloudinary = async (fileUrl) => {
     const filePublicId = extractPublicIdFromUrl(fileUrl);
 
     if (!filePublicId) return null;
-    await cloudinary.uploader.destroy(filePublicId);
+    // First try to delete as an image
+    let response = await cloudinary.uploader.destroy(filePublicId, {
+      resource_type: "image",
+    });
+
+    // If not found, try to delete as a video
+    if (response.result === "not found") {
+      await cloudinary.uploader.destroy(filePublicId, {
+        resource_type: "video",
+      });
+    }
 
     console.log("Successfully deleted File from Cloudinary! ");
-  } 
-  catch (error) {
-    console.log(
-      "File deletion from Cloudinary failed! ",
-      error
-    );
+  } catch (error) {
+    console.log("File deletion from Cloudinary failed! ", error);
   }
 };
 
