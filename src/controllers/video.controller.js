@@ -170,4 +170,63 @@ const updateVideoThumbnail = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, video, "Thumbnail updated Successfully!"));
 });
 
-export { uploadVideo, getVideoById, updateVideoDetails, updateVideoThumbnail };
+const togglePublishStatus = asyncHandler(async (req, res) => {
+  // 1) get video id from url
+  // 2) find video
+  // 3) add toggle functionality
+  // 4) update object
+  // 5) sen res
+  const { videoId } = req.params;
+  const video = await Video.findById({
+    _id: videoId,
+  });
+
+  if (!video) {
+    throw new ApiError("Problem in finding video database", 500);
+  }
+
+  if (video.isPublished === true) {
+    video.isPublished = false;
+    await video.save();
+  } else {
+    video.isPublished = true;
+    await video.save();
+  }
+
+  res
+    .status(200)
+    .json(
+      new ApiResponse(200, video, "Successfully toggled Video Publish Status")
+    );
+});
+
+const deleteVideo = asyncHandler(async (req, res) => {
+  const { videoId } = req.params;
+
+  const video = await Video.findById({
+    _id: videoId,
+  });
+
+  if (!video) {
+    throw new ApiError("Problem in finding video from database", 500);
+  }
+
+  const videoFileTobeDeleted = video.videoFile;
+  const thumbnailTobeDeleted = video.thumbnail;
+
+  await video.deleteOne();
+
+  await deleteFromCloudinary(videoFileTobeDeleted);
+  await deleteFromCloudinary(thumbnailTobeDeleted);
+
+  res.status(200).json(new ApiResponse(200, {},"Successfully deleted video!"));
+});
+
+export {
+  uploadVideo,
+  getVideoById,
+  updateVideoDetails,
+  updateVideoThumbnail,
+  togglePublishStatus,
+  deleteVideo,
+};
