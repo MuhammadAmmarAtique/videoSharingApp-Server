@@ -219,7 +219,45 @@ const deleteVideo = asyncHandler(async (req, res) => {
   await deleteFromCloudinary(videoFileTobeDeleted);
   await deleteFromCloudinary(thumbnailTobeDeleted);
 
-  res.status(200).json(new ApiResponse(200, {},"Successfully deleted video!"));
+  res.status(200).json(new ApiResponse(200, {}, "Successfully deleted video!"));
+});
+
+const getAllVideos = asyncHandler(async (req, res) => {
+  const { page = 1, limit = 10, query, sortBy, sortType } = req.query;
+
+  //converting string to number
+  const pageValue = Number(page);
+  const limitValue = Number(limit);
+
+  //matchStage object will hold the criteria for filtering videos inside aggregation pipeline
+  const matchStage = {};
+  if (query) {
+    matchStage.title = { $regex: query, $options: "i" };
+  }
+
+  const sortDirection = sortType === "asc" ? 1 : -1;
+
+  const aggregationPipeline = [
+    { $match: matchStage }, //1) filtering
+    { $sort: { [sortBy]: sortDirection } }, //2) sorting
+  ];
+
+  const options = {
+    page: pageValue,
+    limit: limitValue,
+  };
+
+  let videos;
+  // 3) applying pagination
+  await Video.aggregatePaginate(Video.aggregate(aggregationPipeline), options)
+    .then((result) => {
+      videos = result;
+    })
+    .catch((err) => {
+      console.error("Error in paginating documents!", err);
+    });
+
+  res.status(200).json(new ApiResponse(200,videos , "Successfuly fetched videos after filtering and sorting from database, then applied pagination functionality to it!"))
 });
 
 export {
@@ -229,4 +267,5 @@ export {
   updateVideoThumbnail,
   togglePublishStatus,
   deleteVideo,
+  getAllVideos,
 };
