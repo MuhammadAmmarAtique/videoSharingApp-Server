@@ -15,12 +15,12 @@ import {
   updateUserCoverImg,
   getUserChannelProfile,
   getUserWatchHistroy,
-  deleteUser
+  deleteUser,
 } from "../controllers/user.controller.js";
 
-const userRouter = Router();
+const router = Router();
 
-userRouter.route("/register").post(
+router.route("/register").post(
   upload.fields([
     {
       name: "avatar",
@@ -33,24 +33,22 @@ userRouter.route("/register").post(
   ]),
   registerUser
 );
-userRouter.route("/login").post(loginUser);
-userRouter.route("/logout").post(verifyJWT, logoutUser);
-userRouter.route("/refresh-Token").post(refreshAcessToken);
-userRouter.route("/change-Password").post(verifyJWT, changePassword);
-userRouter.route("/forget-Password").post(forgetPassword);
-userRouter.route("/reset-Password").post(resetPassword);
-userRouter.route("/get-current-User").get(verifyJWT, getCurrentUser);
-userRouter
-  .route("/update-Account-Details")
-  .patch(verifyJWT, updateAccountDetails);
-userRouter
+router.route("/login").post(loginUser);
+router.route("/logout").post(verifyJWT, logoutUser);
+router.route("/refresh-Token").post(refreshAcessToken);
+router.route("/change-Password").post(verifyJWT, changePassword);
+router.route("/forget-Password").post(forgetPassword);
+router.route("/reset-Password").post(resetPassword);
+router.route("/get-current-User").get(verifyJWT, getCurrentUser);
+router.route("/update-Account-Details").patch(verifyJWT, updateAccountDetails);
+router
   .route("/update-User-AvatarImg")
   .patch(verifyJWT, upload.single("avatar"), updateUserAvatarImg);
-userRouter
+router
   .route("/update-User-CoverImg")
   .patch(verifyJWT, upload.single("coverImage"), updateUserCoverImg);
-userRouter.route("/c/:username").get(verifyJWT, getUserChannelProfile);
-userRouter.route("/get-User-Watch-Histroy").get(verifyJWT, getUserWatchHistroy);
-userRouter.route("/delete-User").delete(verifyJWT,deleteUser);
+router.route("/c/:username").get(verifyJWT, getUserChannelProfile);
+router.route("/get-User-Watch-Histroy").get(verifyJWT, getUserWatchHistroy);
+router.route("/delete-User").delete(verifyJWT, deleteUser);
 
-export default userRouter;
+export default router;

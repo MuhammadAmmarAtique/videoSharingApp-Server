@@ -1,12 +1,21 @@
 import { Router } from "express";
 import { verifyJWT } from "../middlewares/authentication.middleware.js";
 import { upload } from "../middlewares/multer.middleware.js";
-import { uploadVideo, getVideoById, updateVideoDetails, updateVideoThumbnail, togglePublishStatus, deleteVideo, getAllVideos } from "../controllers/video.controller.js";
+import {
+  uploadVideo,
+  getVideoById,
+  updateVideoDetails,
+  updateVideoThumbnail,
+  togglePublishStatus,
+  deleteVideo,
+  getAllVideos,
+} from "../controllers/video.controller.js";
 
-const videoRouter = Router();
+const router = Router();
+// Apply verifyJWT middleware to all routes in this file i.e User must be logged in to upload,get,update,delete... video!
+router.use(verifyJWT);
 
-videoRouter.route("/upload-video").post(
-  verifyJWT,
+router.route("/upload-video").post(
   upload.fields([
     {
       name: "videoFile",
@@ -19,12 +28,13 @@ videoRouter.route("/upload-video").post(
   ]),
   uploadVideo
 );
-videoRouter.route("/v/:videoId").get(verifyJWT, getVideoById);
-videoRouter.route("/update-video-details/:videoId").patch(verifyJWT, updateVideoDetails);
-videoRouter.route("/update-video-thumbnail/:videoId").patch(verifyJWT,upload.single('newThumbnail'), updateVideoThumbnail);
-videoRouter.route("/toggle-publish-status/:videoId").patch(verifyJWT, togglePublishStatus);
-videoRouter.route("/delete-video/:videoId").delete(verifyJWT, deleteVideo);
-videoRouter.route("/get-All-Videos").get(verifyJWT, getAllVideos);
+router.route("/v/:videoId").get(getVideoById);
+router.route("/update-video-details/:videoId").patch(updateVideoDetails);
+router
+  .route("/update-video-thumbnail/:videoId")
+  .patch(upload.single("newThumbnail"), updateVideoThumbnail);
+router.route("/toggle-publish-status/:videoId").patch(togglePublishStatus);
+router.route("/delete-video/:videoId").delete(deleteVideo);
+router.route("/get-All-Videos").get(getAllVideos);
 
-
-export default videoRouter;
+export default router;
