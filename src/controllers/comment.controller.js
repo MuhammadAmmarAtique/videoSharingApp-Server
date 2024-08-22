@@ -25,4 +25,31 @@ const addComment = asyncHandler(async (req, res) => {
     );
 });
 
-export { addComment };
+const updateComment = asyncHandler(async (req, res) => {
+  const { commentId } = req.params;
+  const { newComment } = req.body;
+  const updatedComment = await Comment.findByIdAndUpdate(
+    commentId,
+    {
+      content: newComment,
+    },
+    { new: true }
+  );
+
+  res
+    .status(200)
+    .json(
+      new ApiResponse(200, updatedComment, "Comment updated Successfully!")
+    );
+});
+
+const deleteComment = asyncHandler(async (req, res) => {
+  const { commentId } = req.params;
+  await Comment.findByIdAndDelete(commentId);
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, {}, "Comment deleted Successfully!"));
+});
+
+export { addComment, updateComment, deleteComment };
