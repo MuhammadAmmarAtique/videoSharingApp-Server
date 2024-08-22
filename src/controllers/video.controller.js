@@ -256,7 +256,7 @@ const getAllVideos = asyncHandler(async (req, res) => {
       videos = result;
     })
     .catch((err) => {
-      console.error("Error in paginating documents!", err);
+      { throw new ApiError("Error in paginating all videos documents!", 500, err)}
     });
 
   res.status(200).json(new ApiResponse(200,videos , "Successfuly fetched videos after filtering and sorting from database, then applied pagination functionality to it!"))
