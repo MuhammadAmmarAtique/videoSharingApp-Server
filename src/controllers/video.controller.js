@@ -8,13 +8,14 @@ import {
 import asyncHandler from "../utils/asyncHandler.js";
 
 const uploadVideo = asyncHandler(async (req, res) => {
-  // 1) user must be authenticated/loged in (verify jwt middleware)
+  // 1) user must be authenticated/logged in (verify jwt middleware) + we can get userId from it, to know which user is uploading video.
   // 2) take tile & decription from user
   // 3) take video and thumbnail temporarily then store to disk temporarily using multer and then upload to cloudianry
   // 4) make video object
   // 5) do entry in database
   // 6) return response
-
+  
+  const user = req.user;
   const { title, description } = req.body;
 
   if (!title?.trim() || !description?.trim()) {
@@ -47,6 +48,7 @@ const uploadVideo = asyncHandler(async (req, res) => {
   const video = await Video.create({
     videoFile: uploadedVideo.url,
     thumbnail: uploadedThumbnail.url,
+    owner: user._id,
     title: title,
     description: description,
     duration: uploadedVideo.duration,
