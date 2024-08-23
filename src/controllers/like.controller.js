@@ -28,14 +28,13 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
 
 const toggleCommentLike = asyncHandler(async (req, res) => {
   const { commentId } = req.params;
-  console.log("commentId: ", commentId);
+
   const user = req.user;
 
   const commentIsLiked = await Like.findOne({
     comment: commentId,
   });
 
-  console.log("commentIsLiked: ", commentIsLiked);
   if (commentIsLiked) {
     await commentIsLiked.deleteOne();
   } else {
