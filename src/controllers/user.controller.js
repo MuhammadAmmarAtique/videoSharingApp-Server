@@ -102,7 +102,7 @@ const loginUser = asyncHandler(async (req, res) => {
   const { username, email, password } = req.body;
 
   // 2) login based on username or email
-  if (username.trim() === "" && email.trim() === "") {
+  if (!username?.trim() && !email?.trim()) {
     throw new ApiError("username or email is must required for login", 400);
   }
   // 3)checking if User already exists or not
@@ -214,7 +214,7 @@ const refreshAcessToken = asyncHandler(async (req, res) => {
 
 const changePassword = asyncHandler(async (req, res) => {
   const { currentPassword, newPassword } = req.body;
-  if (currentPassword.trim() === "" || newPassword.trim() === "") {
+  if (!currentPassword?.trim() || !newPassword?.trim()) {
     throw new ApiError("Must enter current and new password! ", 401);
   }
   const user = req.user; //getting user through authentication middleware
@@ -326,7 +326,7 @@ const getCurrentUser = asyncHandler(async (req, res) => {
 const updateAccountDetails = asyncHandler(async (req, res) => {
   const { fullName, email } = req.body;
 
-  if (fullName.trim() === "" && email.trim() === "") {
+  if (!fullName?.trim() && !email?.trim()) {
     throw new ApiError(
       "Email or fullname is must required for updating account details!",
       400
