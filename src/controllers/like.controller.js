@@ -13,7 +13,7 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
   });
 
   if (videoIsLiked) {
-    await videoIsLiked.deleteOne();
+    await videoIsLiked.deleteOne(); //unliking video
   } else {
     await Like.create({
       likedBy: user._id,
@@ -28,7 +28,6 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
 
 const toggleCommentLike = asyncHandler(async (req, res) => {
   const { commentId } = req.params;
-
   const user = req.user;
 
   const commentIsLiked = await Like.findOne({
@@ -36,7 +35,7 @@ const toggleCommentLike = asyncHandler(async (req, res) => {
   });
 
   if (commentIsLiked) {
-    await commentIsLiked.deleteOne();
+    await commentIsLiked.deleteOne();  //unliking comment
   } else {
     await Like.create({
       likedBy: user._id,
@@ -47,6 +46,28 @@ const toggleCommentLike = asyncHandler(async (req, res) => {
   res
     .status(200)
     .json(new ApiResponse(200, {}, "Toggling like on Comment Successfully!"));
+});
+
+const toggleTweetLike = asyncHandler(async (req, res) => {
+  const { tweetId } = req.params;
+  const user = req.user;
+
+  const tweetIsLiked = await Like.findOne({
+    tweet: tweetId,
+  });
+
+  if (tweetIsLiked) {
+    await tweetIsLiked.deleteOne();  //unliking tweet
+  } else {
+    await Like.create({
+      likedBy: user._id,
+      tweet: tweetId,
+    });
+  }
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, {}, "Toggling like on Tweet Successfully!"));
 });
 
 const getAllUserLikedVideos = asyncHandler(async (req, res) => {
@@ -76,4 +97,4 @@ const getAllUserLikedVideos = asyncHandler(async (req, res) => {
     );
 });
 
-export { toggleVideoLike, toggleCommentLike, getAllUserLikedVideos };
+export { toggleVideoLike, toggleCommentLike, toggleTweetLike,  getAllUserLikedVideos };
