@@ -59,4 +59,21 @@ const deleteTweet = asyncHandler(async (req, res) => {
   .json(new ApiResponse(200, {}, "Tweet Deleted Successfully!"));
 });
 
-export { createTweet, updateTweet, deleteTweet };
+const getUserTweets = asyncHandler(async (req, res) => {
+    const user = req.user;
+    const userTweets = await Tweet.aggregate([{
+        $match:{
+            owner: new mongoose.Types.ObjectId(user._id)
+        }
+    }])
+    
+    if (userTweets.length === 0) {
+        throw new ApiError("User doenot have any Tweets!", 400);
+    }
+
+    res
+    .status(200)
+    .json(new ApiResponse(200, userTweets, "Fetched all tweets of User Successfully!"));
+})
+
+export { createTweet, updateTweet, deleteTweet,getUserTweets };
