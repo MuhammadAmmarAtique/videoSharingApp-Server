@@ -20,6 +20,7 @@ import healthcheckRouter from "./routes/healthcheck.route.js";
 import userRouter from "./routes/user.routes.js";
 import videoRouter from "./routes/video.routes.js";
 import commentRouter from "./routes/comment.route.js"
+import likeRouter from "./routes/like.route.js"
 
 //routes declaration
 app.use("/api/v1/healthcheck", healthcheckRouter);
@@ -27,5 +28,6 @@ app.use("/api/v1/users", userRouter);
 // http://localhost:7000/api/v1/users/register
 app.use("/api/v1/videos", videoRouter);
 app.use("/api/v1/comments", commentRouter);
+app.use("/api/v1/likes", likeRouter);
 
 export default app;
