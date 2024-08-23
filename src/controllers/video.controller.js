@@ -6,6 +6,7 @@ import {
   uploadOnCloudinary,
 } from "../utils/cloudinary.js";
 import asyncHandler from "../utils/asyncHandler.js";
+import mongoose from "mongoose";
 
 const uploadVideo = asyncHandler(async (req, res) => {
   // 1) user must be authenticated/logged in (verify jwt middleware) + we can get userId from it, to know which user is uploading video.
@@ -14,7 +15,7 @@ const uploadVideo = asyncHandler(async (req, res) => {
   // 4) make video object
   // 5) do entry in database
   // 6) return response
-  
+
   const user = req.user;
   const { title, description } = req.body;
 
@@ -226,6 +227,7 @@ const deleteVideo = asyncHandler(async (req, res) => {
 
 const getAllVideos = asyncHandler(async (req, res) => {
   const { page = 1, limit = 10, query, sortBy, sortType } = req.query;
+  const user = req.user;
 
   //converting string to number
   const pageValue = Number(page);
@@ -234,12 +236,22 @@ const getAllVideos = asyncHandler(async (req, res) => {
   //matchStage object will hold the criteria for filtering videos inside aggregation pipeline
   const matchStage = {};
   if (query) {
-    matchStage.title = { $regex: query, $options: "i" };
+    //what ever query user writes we will search user query kws with-in videos title.
+    matchStage.title = {
+      $regex: query,
+      $options: "i",
+    };
   }
 
   const sortDirection = sortType === "asc" ? 1 : -1;
 
   const aggregationPipeline = [
+    {
+      $match: {
+        //0)getting all user uploaded videos
+        owner: new mongoose.Types.ObjectId(user._id),
+      },
+    },
     { $match: matchStage }, //1) filtering
     { $sort: { [sortBy]: sortDirection } }, //2) sorting
   ];
@@ -256,10 +268,27 @@ const getAllVideos = asyncHandler(async (req, res) => {
       videos = result;
     })
     .catch((err) => {
-      { throw new ApiError("Error in paginating all videos documents!", 500, err)}
+      {
+        throw new ApiError(
+          "Error in paginating all videos documents!",
+          500,
+          err
+        );
+      }
     });
 
-  res.status(200).json(new ApiResponse(200,videos , "Successfuly fetched videos after filtering and sorting from database, then applied pagination functionality to it!"))
+  if (videos.length === 0) {
+    throw new ApiError("User doensot have any Videos!", 400);
+  }
+  res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        videos,
+        "Successfuly fetched videos after filtering and sorting from database, then applied pagination functionality to it!"
+      )
+    );
 });
 
 export {
