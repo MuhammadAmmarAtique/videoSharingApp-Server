@@ -4,6 +4,8 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { Like } from "../models/like.model.js";
 import mongoose, { isValidObjectId } from "mongoose";
 
+// Whenever there is a button in UI "toggle controller" is written b/c one time it will create object, other time it will delete object from database e.g like button, subscribe button
+
 const toggleVideoLike = asyncHandler(async (req, res) => {
   const { videoId } = req.params;
   const user = req.user;
