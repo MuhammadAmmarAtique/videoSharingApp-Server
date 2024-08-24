@@ -434,12 +434,8 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
     throw new ApiError("Error in getting Username from url", 400);
   }
 
-  //way#1 of finding User
-  // const user = await User.findOne({username})
-  // console.log("user: ", user);
-
-  const getUserChannelProfile = await User.aggregate([
-    //stage 1 (way#2 of finding User/ we know that User is "Channel" also)
+  const AggregationPipeline = await User.aggregate([
+    //stage 1
     {
       $match: {
         //match operator will find that user object whose username matched with one we are getting from url
@@ -454,6 +450,7 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
         localField: "_id", // lets suppose our channel is "chai-aur-code", it has unique id.
         foreignField: "channel", //above id will be matched to channel field id & we will get our channel subscribers
         as: "subscribers",
+        //here, lookup operator will add field as subscibers which is an array of objects.
       },
     },
     // stage 3 (Finding to whom our channel/User "subscribed")
@@ -469,17 +466,18 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
     {
       $addFields: {
         subcribersCount: {
-          $size: "$subscribers", //size operator will count all the objects inside subscribers Array
+          $size: "$subscribers", //size operator will count all the objects inside "subscribers" Array
         },
         channelSubscribedToCount: {
           $size: "$subscribedTo",
         },
         isSubscribed: {
+          //check whether user is subscribed to channel he is visiting.
           $cond: {
             if: { $in: [req.user?._id, "$subscribers.subscriber"] },
-            then: true,
-            else: false,
-          },
+            then: true, // logged-in user ki id, stage 2 mai bnaay hoay array of objects ka andar dekhi jaiy gee,
+            else: false, // jis saay ya pta chal jaiy ga kaay user, jis channel ko visit kar raha usko subscribe kia hoa ya nhi
+          }, //jab kaay channel haam na username saay search kia hai na kaay userId saay sirf "isSubcribed" field kaay liay.
         },
       },
     },
@@ -491,6 +489,8 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
         fullName: 1,
         avatar: 1,
         coverImage: 1,
+        // subscribers:1,  //here we are not showinf "fields" made during stage 2 & 3
+        // subscribedTo: 1,
         subcribersCount: 1,
         channelSubscribedToCount: 1,
         isSubscribed: 1,
@@ -499,9 +499,9 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
   ]);
 
   //**IMP**// comment every pipeline and see output of every pipeline what it does!
-  // console.log("getUserChannelProfile:", getUserChannelProfile);
+  // console.log("AggregationPipeline:", AggregationPipeline);
 
-  if (!getUserChannelProfile?.length) {
+  if (!AggregationPipeline?.length) {
     throw new ApiError("Channel doesnot exists", 400);
   }
 
@@ -510,14 +510,14 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
     .json(
       new ApiResponse(
         200,
-        getUserChannelProfile[0],
+        AggregationPipeline[0],
         "Channel fetched successfully!"
       )
     );
 });
 
 const getUserWatchHistroy = asyncHandler(async (req, res) => {
-  const UserWatchHistroy = await User.aggregate([
+  const AggregationPipeline = await User.aggregate([
     // stage 1 (getting User)
     {
       $match: {
@@ -528,12 +528,14 @@ const getUserWatchHistroy = asyncHandler(async (req, res) => {
     // stage 2 (getting all videos User has watched) (its Pipeline with subPipelines)
     {
       $lookup: {
+        //USER->VIDEO (for watchHistroy)
         from: "videos",
         localField: "watchHistory",
         foreignField: "_id",
         as: "watchHistory",
-        // subpipeline (to add owner field inside videos)
+        // subpipeline (Just to add details about "owner" field inside videos objects)
         pipeline: [
+          //VIDEO->USER (for owner)
           {
             $lookup: {
               from: "users",
@@ -542,6 +544,7 @@ const getUserWatchHistroy = asyncHandler(async (req, res) => {
               as: "owner",
               // sub-sub pipeline (to send only necessary data of user inside owner field)
               pipeline: [
+                // USER->USER (for projecting necessary data)
                 {
                   $project: {
                     username: 1,
@@ -552,7 +555,7 @@ const getUserWatchHistroy = asyncHandler(async (req, res) => {
               ],
             },
           },
-          //when above work is done sending object back, instead of Array of object.
+          //when above work is done sending "owner" object back, instead of Array of object.
           {
             $addFields: {
               owner: {
@@ -564,17 +567,15 @@ const getUserWatchHistroy = asyncHandler(async (req, res) => {
       },
     },
   ]);
-  console.log(UserWatchHistroy);
 
-  return res
-    .status(200)
-    .json(
-      new ApiResponse(
-        200,
-        UserWatchHistroy[0],
-        "User watched histroy fetched Successfully!"
-      )
-    );
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      AggregationPipeline[0],
+      // AggregationPipeline[0].watchHistory,
+      "User watched histroy fetched Successfully!"
+    )
+  );
 });
 
 const deleteUser = asyncHandler(async (req, res) => {
