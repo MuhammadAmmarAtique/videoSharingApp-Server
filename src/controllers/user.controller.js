@@ -516,6 +516,33 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
     );
 });
 
+// Whenever user will watch a video, videoId will be pushed inside "watchHistroy" array (as defined in User object), these videoIds will be used inside "getUserWatchHistroy" controller for getting watch histroy of user with important details like videoFile link, title ,decription etc using Aggregation Pipeline.
+
+const userWatchingVideo = asyncHandler(async (req, res) => {
+  const { videoId } = req.params;
+  const user = req.user;
+
+  const updatedUser = await User.findByIdAndUpdate(
+    user._id,
+    {
+      $push: { watchHistory: videoId },
+    },
+    {
+      new: true,
+    }
+  );
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        updatedUser,
+        "Successfully added videoId inside user watchHistory Array!"
+      )
+    );
+});
+
 const getUserWatchHistroy = asyncHandler(async (req, res) => {
   const AggregationPipeline = await User.aggregate([
     // stage 1 (getting User)
@@ -533,7 +560,7 @@ const getUserWatchHistroy = asyncHandler(async (req, res) => {
         localField: "watchHistory",
         foreignField: "_id",
         as: "watchHistory",
-        // subpipeline (Just to add details about "owner" field inside videos objects)
+        // subpipeline (***EXTRA WORK*** Just to add details about "owner" field inside videos objects)
         pipeline: [
           //VIDEO->USER (for owner)
           {
@@ -613,6 +640,7 @@ export {
   updateUserAvatarImg,
   updateUserCoverImg,
   getUserChannelProfile,
+  userWatchingVideo,
   getUserWatchHistroy,
   deleteUser,
 };

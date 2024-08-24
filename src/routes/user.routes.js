@@ -14,6 +14,7 @@ import {
   updateUserAvatarImg,
   updateUserCoverImg,
   getUserChannelProfile,
+  userWatchingVideo,
   getUserWatchHistroy,
   deleteUser,
 } from "../controllers/user.controller.js";
@@ -48,6 +49,7 @@ router
   .route("/update-User-CoverImg")
   .patch(verifyJWT, upload.single("coverImage"), updateUserCoverImg);
 router.route("/c/:username").get(verifyJWT, getUserChannelProfile);
+router.route("/user-Watching-Video/:videoId").post(verifyJWT,userWatchingVideo);
 router.route("/get-User-Watch-Histroy").get(verifyJWT, getUserWatchHistroy);
 router.route("/delete-User").delete(verifyJWT, deleteUser);
 
