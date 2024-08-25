@@ -103,22 +103,37 @@ const getPlaylistById = asyncHandler(async (req, res) => {
 });
 
 const getUserPlaylists = asyncHandler(async (req, res) => {
-  const user = req.user;
-  const userId = user._id;
-  if (!isValidObjectId(userId)) {
-    throw new ApiError("Invalid userId!", 400);
-  }
-  const userPlaylists = await Playlist.find({
-    owner: new mongoose.Types.ObjectId(userId),
-  });
+const userId = req.user._id
 
+ const AggregationPipeline = await Playlist.aggregate([
+   {
+     $match:{
+       owner: userId
+      }
+    },
+    {
+      $lookup:{
+        from: "videos",
+        localField: "videos",
+        foreignField: "_id",
+        as: "videos",
+      }
+    },
+    {
+      $project:{
+        videos:1
+      }
+    }
+  ])
+  
+  console.log("AggregationPipeline: ", AggregationPipeline);
   res
     .status(200)
     .json(
       new ApiResponse(
         200,
-        userPlaylists,
-        "Successfully fetched all User Playlist from database!"
+        AggregationPipeline,
+        "Successfully fetched User Playlist containing all videos from database!"
       )
     );
 });
