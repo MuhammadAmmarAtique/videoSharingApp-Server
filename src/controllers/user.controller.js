@@ -489,7 +489,7 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
         fullName: 1,
         avatar: 1,
         coverImage: 1,
-        // subscribers:1,  //here we are not showinf "fields" made during stage 2 & 3
+        // subscribers:1,  //here we are not showing "fields" made during stage 2 & 3
         // subscribedTo: 1,
         subcribersCount: 1,
         channelSubscribedToCount: 1,
