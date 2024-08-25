@@ -5,6 +5,7 @@ import { Like } from "../models/like.model.js";
 import mongoose, { isValidObjectId } from "mongoose";
 
 // Whenever there is a button in UI "toggle controller" is written b/c one time it will create object, other time it will delete object from database e.g like button, subscribe button
+let result;
 
 const toggleVideoLike = asyncHandler(async (req, res) => {
   const { videoId } = req.params;
@@ -16,16 +17,18 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
 
   if (videoIsLiked) {
     await videoIsLiked.deleteOne(); //unliking video
+    result = "unliked";
   } else {
     await Like.create({
       likedBy: user._id,
       video: videoId,
     });
+    result = "liked";
   }
 
   res
     .status(200)
-    .json(new ApiResponse(200, {}, "Toggling like on Video Successfully!"));
+    .json(new ApiResponse(200, {}, ` Successfully ${result} video!`));
 });
 
 const toggleCommentLike = asyncHandler(async (req, res) => {
@@ -37,17 +40,19 @@ const toggleCommentLike = asyncHandler(async (req, res) => {
   });
 
   if (commentIsLiked) {
-    await commentIsLiked.deleteOne();  //unliking comment
+    await commentIsLiked.deleteOne(); //unliking comment
+    result = "unliked";
   } else {
     await Like.create({
       likedBy: user._id,
       comment: commentId,
     });
+    result = "liked";
   }
 
   res
     .status(200)
-    .json(new ApiResponse(200, {}, "Toggling like on Comment Successfully!"));
+    .json(new ApiResponse(200, {}, ` Successfully ${result} comment!`));
 });
 
 const toggleTweetLike = asyncHandler(async (req, res) => {
@@ -59,22 +64,24 @@ const toggleTweetLike = asyncHandler(async (req, res) => {
   });
 
   if (tweetIsLiked) {
-    await tweetIsLiked.deleteOne();  //unliking tweet
+    await tweetIsLiked.deleteOne(); //unliking tweet
+    result = "unliked";
   } else {
     await Like.create({
       likedBy: user._id,
       tweet: tweetId,
     });
+    result = "liked";
   }
 
   res
     .status(200)
-    .json(new ApiResponse(200, {}, "Toggling like on Tweet Successfully!"));
+    .json(new ApiResponse(200, {}, ` Successfully ${result} tweet!`));
 });
 
 const getAllUserLikedVideos = asyncHandler(async (req, res) => {
   const user = req.user;
-  
+
   // Validate user._id
   if (!isValidObjectId(user._id)) {
     throw new ApiError("Invalid User ID", 400);
@@ -99,4 +106,9 @@ const getAllUserLikedVideos = asyncHandler(async (req, res) => {
     );
 });
 
-export { toggleVideoLike, toggleCommentLike, toggleTweetLike,  getAllUserLikedVideos };
+export {
+  toggleVideoLike,
+  toggleCommentLike,
+  toggleTweetLike,
+  getAllUserLikedVideos,
+};
