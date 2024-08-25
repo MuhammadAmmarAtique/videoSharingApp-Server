@@ -4,55 +4,43 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { Subscription } from "../models/subscription.model.js";
 import mongoose, { isValidObjectId } from "mongoose";
 
-const subscribeChannel = asyncHandler(async (req, res) => {
-  const user = req.user;
+// Whenever there is a button in UI "toggle controller" is written b/c one time it will create object, other time it will delete object from database e.g here toggleSubscription will one time subscribe channel and other time unsubcribe channel.
+const toggleSubscription = asyncHandler(async (req, res) => {
   const { channelId } = req.params;
-
-  const subscription = await Subscription.create({
-    subscriber: user._id,
-    channel: channelId,
-  });
-
-  if (!subscription) {
-    throw new ApiError("Problem in subscribing Chaneel!", 500);
-  }
-
-  res
-    .status(200)
-    .json(
-      new ApiResponse(
-        200,
-        subscription,
-        "User has successfully Subscribed a Channel! "
-      )
-    );
-});
-
-const unsubscribeChannel = asyncHandler(async (req, res) => {
   const user = req.user;
-  const { channelId } = req.params;
 
   const subscription = await Subscription.findOne({
-    subscriber: user._id,
-    channel: channelId,
+    channel : channelId
   });
+  console.log("subscription: ", subscription);
 
+  let result;
   if (!subscription) {
-    throw new ApiError("User is already unsubscribed!", 400);
+     await Subscription.create({
+      subscriber: user._id,
+      channel: channelId,
+    });
+    result = "subscribed";
+  } else {
+     await subscription.deleteOne(); //unsubscribe
+    result = "unSubscribed";
   }
-  await subscription.deleteOne();
-
   res
     .status(200)
-    .json(
-      new ApiResponse(200, {}, "User has successfully unSubscribed a Channel! ")
-    );
+    .json(new ApiResponse(200, {}, `Successfully ${result} channel!`));
 });
 
 // controller to return subscriber list of a channel
 const getUserChannelSubscribers = asyncHandler(async (req, res) => {
   const { channelId } = req.params;
-  res.send("work in progresss!!!");
 });
 
-export { subscribeChannel, unsubscribeChannel, getUserChannelSubscribers };
+// controller to return channel list to which user has subscribed
+const getSubscribedChannels = asyncHandler(async (req, res) => {
+  const { subscriberId } = req.params;
+});
+
+// *** After completed making above  3 controller i.e toggleSubscription, getUserChannelSubscribers, getSubscribedChannels
+//  WORK ON MAIKING getUserPlaylist() controller like getUserWatchHistroy()
+
+export { toggleSubscription, getUserChannelSubscribers };
