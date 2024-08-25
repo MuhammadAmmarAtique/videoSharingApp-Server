@@ -516,7 +516,7 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
     );
 });
 
-// Whenever user will watch a video, videoId will be pushed inside "watchHistroy" array (as defined in User object), these videoIds will be used inside "getUserWatchHistroy" controller for getting watch histroy of user with important details like videoFile link, title ,decription etc using Aggregation Pipeline.
+// Whenever user will watch a video, videoId will be pushed inside "watchHistroy" array (as defined in User Model), these videoIds will be used inside "getUserWatchHistroy" controller for getting watch histroy of user with important details like videoFile link, title ,decription etc using Aggregation Pipeline.
 
 const userWatchingVideo = asyncHandler(async (req, res) => {
   const { videoId } = req.params;
