@@ -1,6 +1,7 @@
 import { ApiError } from "../utils/ApiError.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import { User } from "../models/user.model.js";
+import { Video } from "../models/video.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { deleteFromCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
@@ -516,16 +517,25 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
     );
 });
 
-// Whenever user will watch a video, videoId will be pushed inside "watchHistroy" array (as defined in User Model), these videoIds will be used inside "getUserWatchHistroy" controller for getting watch histroy of user with important details like videoFile link, title ,decription etc using Aggregation Pipeline.
+// Whenever user will watch a video, videoId will be pushed inside "watchHistroy" array (as defined in User Model), these videoIds will be used inside "getUserWatchHistroy" controller fro replacing videoIds with actual videos documents from database using Aggregation Pipeline (helping us getting all details like videofile,thumbnail,title, duration etc)
+// Also here we will increment video document views field by one.
 
-const userWatchingVideo = asyncHandler(async (req, res) => {
+const updateWatchHistoryAndViews = asyncHandler(async (req, res) => {
   const { videoId } = req.params;
   const user = req.user;
 
   const updatedUser = await User.findByIdAndUpdate(
     user._id,
+    { $addToSet: { watchHistory: videoId } }, //$addToSet will add userId inside watchHistroy array & prevents duplicates
     {
-      $push: { watchHistory: videoId },
+      new: true,
+    }
+  );
+
+  const updatedVideo = await Video.findByIdAndUpdate(
+    videoId,
+    {
+      $inc: { views: 1 },
     },
     {
       new: true,
@@ -537,8 +547,8 @@ const userWatchingVideo = asyncHandler(async (req, res) => {
     .json(
       new ApiResponse(
         200,
-        updatedUser,
-        "Successfully added videoId inside user watchHistory Array!"
+        { updatedUser, updatedVideo },
+        "Successfully added videoId inside user watchHistory Array! + Incremeneted views field of Video document!"
       )
     );
 });
@@ -640,7 +650,7 @@ export {
   updateUserAvatarImg,
   updateUserCoverImg,
   getUserChannelProfile,
-  userWatchingVideo,
+  updateWatchHistoryAndViews,
   getUserWatchHistroy,
   deleteUser,
 };
