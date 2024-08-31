@@ -8,6 +8,30 @@ import {
 import asyncHandler from "../utils/asyncHandler.js";
 import mongoose from "mongoose";
 
+//imgAllowedMimeTypes & videoAllowedMimeTypes to be used in Validating the mimetype of (req.files/req.file of multer) during images & videos upload & updation to ensure user is giving us proper required files for our fields.
+
+const imgAllowedMimeTypes = [
+  "image/jpeg", // JPEG
+  "image/png", // PNG
+  "image/gif", // GIF
+  "image/webp", // WebP
+  "image/bmp", // BMP
+  "image/tiff", // TIFF
+  "image/jfif", // JFIF
+];
+
+const videoAllowedMimeTypes = [
+  "video/mp4",    // MP4
+  "video/x-matroska", // MKV
+  "video/webm",   // WebM
+  "video/ogg",    // Ogg
+  "video/quicktime", // MOV (QuickTime)
+  "video/x-msvideo", // AVI
+  "video/x-ms-wmv",  // WMV
+  "video/mpeg",   // MPEG
+];
+
+
 const uploadVideo = asyncHandler(async (req, res) => {
   // 1) user must be authenticated/logged in (verify jwt middleware) + we can get userId from it, to know which user is uploading video.
   // 2) take tile & decription from user
@@ -34,7 +58,31 @@ const uploadVideo = asyncHandler(async (req, res) => {
   }
 
   const videoFilePath = req.files?.videoFile?.[0]?.path;
+  // checking if user gave proper video file for "Video"
+  if (
+    !videoAllowedMimeTypes.includes(
+      req.files?.videoFile?.[0]?.mimetype 
+    )
+  ) {
+    throw new ApiError(
+      "Invalid file type! Please upload an video file for Video i.e ( MP4,MKV,WebM,Ogg,MOV,AVI, WMV, MPEG)",
+      400
+    );
+  }
+
   const thumbnailFilePath = req.files?.thumbnail?.[0]?.path;
+  // checking if user gave proper image file for "Thumbnail"
+   if (
+    !imgAllowedMimeTypes.includes(
+      req.files?.thumbnail?.[0]?.mimetype 
+    )
+  ) {
+    throw new ApiError(
+      "'Invalid file type! Please upload an image file for Thumbnail i.e (jpeg, png, gif, webp, bmp, tiff, jfif).' ",
+      400
+    );
+  }
+
 
   if (!videoFilePath || !thumbnailFilePath) {
     throw new ApiError(
@@ -152,6 +200,14 @@ const updateVideoThumbnail = asyncHandler(async (req, res) => {
 
   if (!newThumbnail) {
     throw new ApiError("Must give new image to update thumbnail", 400);
+  }
+
+   //checking if user gave us proper image file for Thumbnail
+   if (!imgAllowedMimeTypes.includes(req.file?.mimetype)) {
+    throw new ApiError(
+      "'Invalid file type! Please upload an image file for Thumbnail i.e (jpeg, png, gif, webp, bmp, tiff, jfif).' ",
+      400
+    );
   }
 
   const uploadedNewThumbnail = await uploadOnCloudinary(newThumbnail);
