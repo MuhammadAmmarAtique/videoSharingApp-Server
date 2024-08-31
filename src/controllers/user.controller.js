@@ -45,6 +45,12 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new ApiError("Must enter all required input fields! ", 400);
   }
 
+  // Check if email is valid
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    throw new ApiError("Invalid email format! ", 400);
+  }
+
   // 3- checking if user with same username or email already exists
   const existedUser = await User.findOne({
     $or: [{ username }, { email }],
@@ -52,7 +58,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
   if (existedUser) {
     throw new ApiError(
-      "User with same email or password already exists! ",
+      "User with same email or username already exists! ",
       400
     );
   }
@@ -60,6 +66,28 @@ const registerUser = asyncHandler(async (req, res) => {
   // 4- checking if user gave us images specially avatar
   const avatarLocalPath = req.files?.avatar?.[0]?.path;
   const coverImageLocalPath = req.files?.coverImage?.[0]?.path;
+
+  // Validate the mimetype  to ensure it's an image
+  const allowedMimeTypes = [
+    "image/jpeg", // JPEG
+    "image/png", // PNG
+    "image/gif", // GIF
+    "image/webp", // WebP
+    "image/bmp", // BMP
+    "image/tiff", // TIFF
+    "image/jfif", // JFIF
+  ];
+
+  if (
+    !allowedMimeTypes.includes(
+      req.files?.avatar?.[0]?.mimetype || req.files?.coverImage?.[0]?.mimetype
+    )
+  ) {
+    throw new ApiError(
+      "'Invalid file type! Please upload an image file for Avatar or Cover Image i.e (jpeg, png, gif, webp, bmp, tiff, jfif).' ",
+      400
+    );
+  }
 
   if (!avatarLocalPath) {
     throw new ApiError("Avatar image is must required for Registration!", 406);
