@@ -34,6 +34,17 @@ const options = {
   secure: true, //then cookies can only be modified from server.
 };
 
+//allowedMimeTypes to be used in Validating the mimetype of (req.files/req.file of multer) during registration & images updation to ensure user is giving us image file.
+const allowedMimeTypes = [
+  "image/jpeg", // JPEG
+  "image/png", // PNG
+  "image/gif", // GIF
+  "image/webp", // WebP
+  "image/bmp", // BMP
+  "image/tiff", // TIFF
+  "image/jfif", // JFIF
+];
+
 const registerUser = asyncHandler(async (req, res) => {
   //1- getting user details
   const { username, email, fullName, password } = req.body;
@@ -66,18 +77,7 @@ const registerUser = asyncHandler(async (req, res) => {
   // 4- checking if user gave us images specially avatar
   const avatarLocalPath = req.files?.avatar?.[0]?.path;
   const coverImageLocalPath = req.files?.coverImage?.[0]?.path;
-
-  // Validate the mimetype  to ensure it's an image
-  const allowedMimeTypes = [
-    "image/jpeg", // JPEG
-    "image/png", // PNG
-    "image/gif", // GIF
-    "image/webp", // WebP
-    "image/bmp", // BMP
-    "image/tiff", // TIFF
-    "image/jfif", // JFIF
-  ];
-
+  //checking if user gave us proper img file
   if (
     !allowedMimeTypes.includes(
       req.files?.avatar?.[0]?.mimetype || req.files?.coverImage?.[0]?.mimetype
@@ -106,7 +106,7 @@ const registerUser = asyncHandler(async (req, res) => {
     username: username.toLowerCase(),
     email,
     fullName,
-    password:password.trim(),
+    password: password.trim(),
     avatar: uploadedAvatar.url,
     coverImage: uploadedCoverImg?.url,
   });
@@ -393,8 +393,17 @@ const updateUserAvatarImg = asyncHandler(async (req, res) => {
   }
   //old image to be deleted after successful new img successful upload
   const oldAvatar = user.avatar;
+
   // 2) Get the new image through the multer middleware
   const avatarLocalPath = req.file?.path;
+
+  //checking if user gave us proper image file
+  if (!allowedMimeTypes.includes(req.file?.mimetype)) {
+    throw new ApiError(
+      "'Invalid file type! Please upload an image file for Avatar i.e (jpeg, png, gif, webp, bmp, tiff, jfif).' ",
+      400
+    );
+  }
 
   if (!avatarLocalPath) {
     throw new ApiError("Must provide image!", 400);
@@ -433,6 +442,14 @@ const updateUserCoverImg = asyncHandler(async (req, res) => {
 
   // 2) Get the new image through the multer middleware
   const coverImageLocalPath = req.file?.path;
+
+  // checking if user gave us proper image file
+  if (!allowedMimeTypes.includes(req.file?.mimetype)) {
+    throw new ApiError(
+      "'Invalid file type! Please upload an image file for Cover Image i.e (jpeg, png, gif, webp, bmp, tiff, jfif).' ",
+      400
+    );
+  }
 
   if (!coverImageLocalPath) {
     throw new ApiError("Must provide image!", 400);
