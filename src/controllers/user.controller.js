@@ -106,7 +106,7 @@ const registerUser = asyncHandler(async (req, res) => {
     username: username.toLowerCase(),
     email,
     fullName,
-    password,
+    password:password.trim(),
     avatar: uploadedAvatar.url,
     coverImage: uploadedCoverImg?.url,
   });
@@ -146,7 +146,7 @@ const loginUser = asyncHandler(async (req, res) => {
     );
   }
   // 4) if user is found then checking password
-  const checkPassord = await existedUser.isPasswordCorrect(password); //method defined in User model
+  const checkPassord = await existedUser.isPasswordCorrect(password.trim()); //method defined in User model
   if (checkPassord === false) {
     throw new ApiError("Password is incorrect, Try again!", 400);
   }
@@ -247,7 +247,7 @@ const changePassword = asyncHandler(async (req, res) => {
     throw new ApiError("Must enter current and new password! ", 401);
   }
   const user = req.user; //getting user through authentication middleware
-  const result = await user.isPasswordCorrect(currentPassword);
+  const result = await user.isPasswordCorrect(currentPassword.trim());
 
   if (result === false) {
     throw new ApiError(
@@ -256,7 +256,7 @@ const changePassword = asyncHandler(async (req, res) => {
     );
   }
 
-  user.password = newPassword; //password hashing is doing inside User model before saving
+  user.password = newPassword.trim(); //password hashing is doing inside User model before saving
   await user.save();
 
   return res
@@ -327,7 +327,7 @@ const resetPassword = asyncHandler(async (req, res) => {
     );
   }
   //2) Hash the new password
-  const hashedPassword = await bcrypt.hash(newPassword, 10);
+  const hashedPassword = await bcrypt.hash(newPassword.trim(), 10);
 
   // 3) Finding and Updating User
   const updatedUser = await User.findByIdAndUpdate(
