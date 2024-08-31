@@ -567,7 +567,7 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
     );
 });
 
-// Whenever user will watch a video, videoId will be pushed inside "watchHistroy" array (as defined in User Model), these videoIds will be used inside "getUserWatchHistroy" controller fro replacing videoIds with actual videos documents from database using Aggregation Pipeline (helping us getting all details like videofile,thumbnail,title, duration etc)
+// Whenever user will watch a video, videoId will be pushed inside "watchHistroy" array (as defined in User Model), these videoIds will be used inside "getUserWatchHistroy" controller for replacing videoIds with actual videos documents from database using Aggregation Pipeline (helping us getting all details like videofile,thumbnail,title, duration etc)
 // Also here we will increment video document views field by one.
 
 const updateWatchHistoryAndViews = asyncHandler(async (req, res) => {
@@ -576,7 +576,7 @@ const updateWatchHistoryAndViews = asyncHandler(async (req, res) => {
 
   const updatedUser = await User.findByIdAndUpdate(
     user._id,
-    { $addToSet: { watchHistory: videoId } }, //$addToSet will add userId inside watchHistroy array & prevents duplicates
+    { $addToSet: { watchHistory: videoId } }, //$addToSet will add userId inside watchHistroy array & prevents duplication.
     {
       new: true,
     }
