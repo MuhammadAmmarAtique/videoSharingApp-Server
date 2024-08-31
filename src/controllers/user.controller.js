@@ -246,6 +246,11 @@ const changePassword = asyncHandler(async (req, res) => {
   if (!currentPassword?.trim() || !newPassword?.trim()) {
     throw new ApiError("Must enter current and new password! ", 401);
   }
+
+  if (currentPassword?.trim() === newPassword?.trim()) {
+    throw new ApiError("Current Password & New Password cannot be same! ", 401);
+  }
+
   const user = req.user; //getting user through authentication middleware
   const result = await user.isPasswordCorrect(currentPassword.trim());
 
