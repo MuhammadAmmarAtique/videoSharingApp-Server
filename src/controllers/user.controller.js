@@ -9,6 +9,7 @@ import jsonwebtoken from "jsonwebtoken";
 import { mongoose } from "mongoose";
 import bcrypt from "bcrypt";
 import nodemailer from "nodemailer";
+import fs from "fs";
 
 // generateAccessAndRefreshToken method will be used for login & refreshing access token.
 const generateAccessAndRefreshToken = async (userId) => {
@@ -83,9 +84,20 @@ const registerUser = asyncHandler(async (req, res) => {
       req.files?.avatar?.[0]?.mimetype || req.files?.coverImage?.[0]?.mimetype
     )
   ) {
-    throw new ApiError(
-      "'Invalid file type! Please upload an image file for Avatar or Cover Image i.e (jpeg, png, gif, webp, bmp, tiff, jfif).' ",
-      400
+    //automatically deleting wrong file from our server
+    fs.unlink( 
+      req.files?.avatar?.[0]?.path || req.files?.coverImage?.[0]?.path,
+      (err) => {
+        if (err) {
+          console.log("Error deleting file:", err);
+        } else {
+          return res
+            .status(400)
+            .json(
+              "Invalid file type! Please upload an image file for Avatar or Cover Image i.e (jpeg, png, gif, webp, bmp, tiff, jfif)"
+            );
+        }
+      }
     );
   }
 
