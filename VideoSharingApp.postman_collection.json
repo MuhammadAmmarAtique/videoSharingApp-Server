@@ -1,0 +1,1211 @@
+{
+	"info": {
+		"_postman_id": "ebb2d48e-9964-4e29-b349-4f6db9b38c23",
+		"name": "VideoSharingApp",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "37456517"
+	},
+	"item": [
+		{
+			"name": "healthcheck",
+			"item": [
+				{
+					"name": "healthcheck",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{server}}/healthcheck/",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"healthcheck",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Sending a simple request to express-server, to check if response is coming, which will indicate everything is okay."
+		},
+		{
+			"name": "user",
+			"item": [
+				{
+					"name": "registerUser",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "username",
+									"value": "",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "",
+									"type": "text"
+								},
+								{
+									"key": "fullName",
+									"value": "",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "",
+									"type": "text"
+								},
+								{
+									"key": "avatar",
+									"type": "file",
+									"src": "/C:/Users/Computer Arena/Desktop/Assets for testing/video controller testing pics/thumbnail.jpg"
+								},
+								{
+									"key": "coverImage",
+									"type": "file",
+									"src": "/C:/Users/Computer Arena/Desktop/Assets for testing/user controller testing pics/coverImg.jpg"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{server}}/users/register",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"users",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "loginUser",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\":\"\",\r\n    \"email\":\"wwe123@gmail.com\",\r\n     \"password\" :\"123ads\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/users/login",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"users",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "logoutUser",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NmI2MDA0NTU1ZTU5YjcwNTdmY2JkNTEiLCJ1c2VybmFtZSI6ImFtbWFyYXRpcSIsImVtYWlsIjoiYW1hbXJhdGlxdWUwOUBtYWlsLmNvbSIsImZ1bGxOYW1lIjoiTXVoYW1tYWQgQW1tYXIgQXRpcXVlIiwiaWF0IjoxNzIzMzc4OTg2LCJleHAiOjE3MjM0NjUzODZ9.teYasKVxMBLnQcZZ90dTMLU-IZKj570y9g4bewv8uXA",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{server}}/users/logout",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"users",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "refreshAcessToken",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/users/refresh-Token",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"users",
+								"refresh-Token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "changePassword",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"currentPassword\":\"124ads\",\r\n     \"newPassword\": \"123ads\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/users/change-Password",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"users",
+								"change-Password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "forgetPassword",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"johncena123@gmail.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/users/forget-Password",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"users",
+								"forget-Password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "resetPassword",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"newPassword\": \"gg123\",\r\n     \"token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NmMzNDZmNDJkMzNjYWM3MjQ0Njk5NGEiLCJpYXQiOjE3MjQwODA0NjcsImV4cCI6MTcyNDA4NDA2N30.ZfJKm50Smbgx40UG1GusFjReDNCnDjGgcvPFuZ7E-_0\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/users/reset-Password",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"users",
+								"reset-Password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getCurrentUser",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{server}}/users/get-current-User",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"users",
+								"get-current-User"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateAccountDetails",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\"fullName\":\"John Felix Anthony Cena Jr.\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/users/update-Account-Details",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"users",
+								"update-Account-Details"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateUserAvatarImg",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "avatar",
+									"type": "file",
+									"src": "/C:/Users/Computer Arena/Desktop/Assets for testing/user controller testing pics/avatarTwo.jpg"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{server}}/users/update-User-AvatarImg",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"users",
+								"update-User-AvatarImg"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateUserCoverImg",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "coverImage",
+									"type": "file",
+									"src": "/C:/Users/Computer Arena/Desktop/Assets for testing/user controller testing pics/coverImgTwo.jpg"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{server}}/users/update-User-CoverImg",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"users",
+								"update-User-CoverImg"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getUserChannelProfile",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{server}}/users/c/wwe",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"users",
+								"c",
+								"wwe"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateWatchHistoryAndViews",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{server}}/users/user-Watching-Video/66d30b6c5b922935a1689d0f",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"users",
+								"user-Watching-Video",
+								"66d30b6c5b922935a1689d0f"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getUserWatchHistroy",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/users/get-User-Watch-Histroy",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"users",
+								"get-User-Watch-Histroy"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deleteUser",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{server}}/users/delete-User",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"users",
+								"delete-User"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Testing all Apis related to User."
+		},
+		{
+			"name": "video",
+			"item": [
+				{
+					"name": "uploadVideo",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "videoFile",
+									"type": "file",
+									"src": "/C:/Users/Computer Arena/Desktop/Assets for testing/video controller testing pics/video.mp4"
+								},
+								{
+									"key": "thumbnail",
+									"type": "file",
+									"src": "/C:/Users/Computer Arena/Desktop/Assets for testing/video controller testing pics/thumbnail.jpg"
+								},
+								{
+									"key": "title",
+									"value": "A",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "A",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{server}}/videos/upload-video",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"videos",
+								"upload-video"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getVideoById",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{server}}/videos/v/66d30b6c5b922935a1689d0f",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"videos",
+								"v",
+								"66d30b6c5b922935a1689d0f"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateVideodetails",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"description\":\"A Detailed Zoo tour covering very animal of the zoo\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/videos/update-video-details/66c47fc90e81ad465cc34f20",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"videos",
+								"update-video-details",
+								"66c47fc90e81ad465cc34f20"
+							],
+							"query": [
+								{
+									"key": "title",
+									"value": "aa",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateVideoThumbnail",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "newThumbnail",
+									"type": "file",
+									"src": "/C:/Users/Computer Arena/Desktop/Assets for testing/video controller testing pics/videoTwo.mp4"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{server}}/videos/update-video-thumbnail/66d30b6c5b922935a1689d0f",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"videos",
+								"update-video-thumbnail",
+								"66d30b6c5b922935a1689d0f"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "togglePublishStatus",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{server}}/videos/toggle-publish-status/66c47fc90e81ad465cc34f20",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"videos",
+								"toggle-publish-status",
+								"66c47fc90e81ad465cc34f20"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deleteVideo",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{server}}/videos/delete-video/66c4e6f464ea1ad5e78aec68",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"videos",
+								"delete-video",
+								"66c4e6f464ea1ad5e78aec68"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getAllVideos",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/videos/get-All-Videos?page=1&limit=10&query=car&sortType=asc&sortBy=title",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"videos",
+								"get-All-Videos"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "query",
+									"value": "car"
+								},
+								{
+									"key": "sortType",
+									"value": "asc"
+								},
+								{
+									"key": "sortBy",
+									"value": "title"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Testing all Apis related to Videos."
+		},
+		{
+			"name": "comment",
+			"item": [
+				{
+					"name": "addComment",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"content\": \"E\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/comments/add-Comment/66c4e993ba9d0d4b679b9ad6",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"comments",
+								"add-Comment",
+								"66c4e993ba9d0d4b679b9ad6"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateComment",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"newComment\" : \"Molana tariq jammel is  a good islamic scholar and his foundation (mtj foundation) is also doing great job!\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/comments/update-Comment/66c76afe8fc4ae28d6331098",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"comments",
+								"update-Comment",
+								"66c76afe8fc4ae28d6331098"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deleteComment",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{server}}/comments/delete-Comment/66c76afe8fc4ae28d6331098",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"comments",
+								"delete-Comment",
+								"66c76afe8fc4ae28d6331098"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getVideoComments",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{server}}/comments/get-video-comments/66c4e993ba9d0d4b679b9ad6?page=1&limit=3",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"comments",
+								"get-video-comments",
+								"66c4e993ba9d0d4b679b9ad6"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "3"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Testing all Apis related to Comments."
+		},
+		{
+			"name": "like",
+			"item": [
+				{
+					"name": "toggleVideoLike",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{server}}/likes/toggle-video-like/66c720b7de18230f45a2787c",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"likes",
+								"toggle-video-like",
+								"66c720b7de18230f45a2787c"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "toggleCommentLike",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{server}}/likes/toggle-comment-like/66c77e91f393e7fb2c011ab1",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"likes",
+								"toggle-comment-like",
+								"66c77e91f393e7fb2c011ab1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "toggleTweetLike",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{server}}/likes/toggle-tweet-like/66c86e0eb13c5624d5e140d8",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"likes",
+								"toggle-tweet-like",
+								"66c86e0eb13c5624d5e140d8"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getAllUserLikedVideos",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{server}}/likes/get-all-user-liked-videos",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"likes",
+								"get-all-user-liked-videos"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Testing all Apis related to Like."
+		},
+		{
+			"name": "tweet",
+			"item": [
+				{
+					"name": "createTweet",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"content\": \"jon cena tweet no 3\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/tweets/create-tweet",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"tweets",
+								"create-tweet"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateTweet",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"newContent\" : \"WHEATHER IS dry\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/tweets/update-tweet/66c862f83b9b348ea9b38904",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"tweets",
+								"update-tweet",
+								"66c862f83b9b348ea9b38904"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deleteTweet",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{server}}/tweets/delete-tweet/66c862f83b9b348ea9b38904",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"tweets",
+								"delete-tweet",
+								"66c862f83b9b348ea9b38904"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getUserTweets",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{server}}/tweets/get-User-tweet",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"tweets",
+								"get-User-tweet"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Testing all Apis related to Tweet."
+		},
+		{
+			"name": "playlist",
+			"item": [
+				{
+					"name": "createPlaylist",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"capital city tour\",\r\n    \"description\": \"A tour of islamabad Pakistan!\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/playlists/create-playlist",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"playlists",
+								"create-playlist"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "addVideoToPlaylist",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{server}}/playlists/add-video-to-playlist/66ca0caf7b688389624acae5/66c8781a8673c403f65242fe",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"playlists",
+								"add-video-to-playlist",
+								"66ca0caf7b688389624acae5",
+								"66c8781a8673c403f65242fe"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "removeVideoFromPlaylist",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{server}}/playlists/remove-video-from-playlist/66c98de1ec2ebfbf638fde26/66c878ba526b1b5d99afe22f",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"playlists",
+								"remove-video-from-playlist",
+								"66c98de1ec2ebfbf638fde26",
+								"66c878ba526b1b5d99afe22f"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getPlaylistById",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{server}}/playlists/get-playlist-by-Id/66c99c5c7eb88260e4e47dfc",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"playlists",
+								"get-playlist-by-Id",
+								"66c99c5c7eb88260e4e47dfc"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getUserPlaylists",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{server}}/playlists/get-user-playlist",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"playlists",
+								"get-user-playlist"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updatePlaylist",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"North Pakistan Tour!\"\r\n    // \"description\" : \"A tour of North Pakistan!\",\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/playlists/update-playlist/66c98de1ec2ebfbf638fde26",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"playlists",
+								"update-playlist",
+								"66c98de1ec2ebfbf638fde26"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deletePlaylist",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{server}}/playlists/delete-playlist/66c98de1ec2ebfbf638fde26",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"playlists",
+								"delete-playlist",
+								"66c98de1ec2ebfbf638fde26"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Testing all Apis related to Playlist."
+		},
+		{
+			"name": "subscription",
+			"item": [
+				{
+					"name": "toggleSubscription",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{server}}/subscriptions/toggle-subscription/66d2ff71a12d99509484f9bd",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"subscriptions",
+								"toggle-subscription",
+								"66d2ff71a12d99509484f9bd"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getChannelSubscribers",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{server}}/subscriptions/get-channel-subscribers/66d2ff71a12d99509484f9bd",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"subscriptions",
+								"get-channel-subscribers",
+								"66d2ff71a12d99509484f9bd"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getUserSubscribedChannels",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{server}}/subscriptions/get-user-subscribed-channel",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"subscriptions",
+								"get-user-subscribed-channel"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Testing all Apis related to Subscription."
+		},
+		{
+			"name": "dashboard",
+			"item": [
+				{
+					"name": "getChannelVideos",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{server}}/dashboard/get-channel-videos",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"dashboard",
+								"get-channel-videos"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getChannelStats",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{server}}/dashboard/get-channel-stats",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"dashboard",
+								"get-channel-stats"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
