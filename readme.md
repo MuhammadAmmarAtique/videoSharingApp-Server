@@ -102,7 +102,32 @@ VideoSharing App is a full-featured video-sharing platform similar to YouTube. I
   Start the server locally using `npm run dev`. The server will run on the port specified in the `.env` file.
 
 - **API Documentation:**
-  Use tools like Postman or Swagger to explore the available endpoints.
+This project provides a comprehensive set of RESTful API endpoints to interact with the VideoSharing App, covering user management, video operations, subscriptions, tweets, playlists, likes, comments, and more.
+
+To facilitate testing and exploration of these endpoints, we have included a Postman collection that contains all the API routes for the VideoSharing App.
+
+## Postman Collection
+
+To make testing easier, we’ve included a Postman collection containing all the endpoints for the VideoSharing App.
+
+### Importing the Collection
+
+1. **Download the Collection:**
+   - Download the Postman collection from [this link](./postman/videoSharingApp.postman_collection.json).
+
+2. **Import to Postman:**
+   - Open Postman and click on the **Import** button in the top left corner.
+   - Select the `videoSharingApp.postman_collection.json` file that you downloaded.
+
+3. **Using the Collection:**
+   - After importing, you'll see the VideoSharing App collection in your Postman under the **Collections** tab.
+   - You can now use this collection to test all the endpoints. 
+
+### Note
+
+- Ensure your local server is running before testing the endpoints.
+- Some endpoints may require authentication.
+
 
 ## Project Structure
 
