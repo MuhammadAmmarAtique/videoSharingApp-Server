@@ -333,8 +333,8 @@ const getAllVideos = asyncHandler(async (req, res) => {
       }
     });
 
-  if (videos.length === 0) {
-    throw new ApiError("User doensot have any Videos!", 400);
+  if (videos.docs.length === 0) {
+    throw new ApiError("Your query doenot matched any video or User doesnot have any Videos uploaded!", 400);
   }
   res
     .status(200)
