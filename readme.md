@@ -112,8 +112,8 @@ To make testing easier, we’ve included a Postman collection containing all the
 
 ### Importing the Collection
 
-1. **Download the Collection:**
-   - Download the Postman collection from [this link](./postman/VideoSharingApp.postman_collection.json).
+1. **Access the Postman Collection:**
+   - The Postman collection is already included in the repository. Once you clone the repository, you can find the collection in the postman folder: [this link](./postman/VideoSharingApp.postman_collection.json).
 
 2. **Import to Postman:**
    - Open Postman and click on the **Import** button in the top left corner.
