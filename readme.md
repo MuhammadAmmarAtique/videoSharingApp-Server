@@ -117,7 +117,7 @@ To make testing easier, we’ve included a Postman collection containing all the
 
 2. **Import to Postman:**
    - Open Postman and click on the **Import** button in the top left corner.
-   - Select the `videoSharingApp.postman_collection.json` file that you downloaded.
+   - Select the `videoSharingApp.postman_collection.json` file that you accessed from postman folder.
 
 3. **Using the Collection:**
    - After importing, you'll see the VideoSharing App collection in your Postman under the **Collections** tab.
