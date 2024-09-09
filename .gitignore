@@ -117,4 +117,7 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
+#Assets (pics/videos ) for Testing user and video controllers
+assets_for_testing
+
 # End of https://mrkandreev.name/snippets/gitignore-generator/#Node
