@@ -14,6 +14,7 @@ const uploadOnCloudinary = async (filePath) => {
     //uploading file on cloudinary
     const response = await cloudinary.uploader.upload(filePath, {
       resource_type: "auto", //is it image/video/audio, we set auto to check automatically
+      folder: "videoSharingApp"
     });
     // Remove the locally saved temporary file after successful upload
     if (fs.existsSync(filePath)) {
