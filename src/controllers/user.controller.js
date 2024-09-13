@@ -146,7 +146,7 @@ const loginUser = asyncHandler(async (req, res) => {
   if (!username?.trim() && !email?.trim()) {
     throw new ApiError("username or email is must required for login", 400);
   }
-  // 3)checking if User already exists or not
+  // 3)checking if User  exists or not
   const existedUser = await User.findOne({
     $or: [{ username }, { email }],
   });
