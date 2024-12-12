@@ -85,7 +85,7 @@ const registerUser = asyncHandler(async (req, res) => {
     )
   ) {
     //automatically deleting wrong file from our server
-    fs.unlink( 
+    fs.unlink(
       req.files?.avatar?.[0]?.path || req.files?.coverImage?.[0]?.path,
       (err) => {
         if (err) {
@@ -133,10 +133,12 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 
   // 9- generating & giving access and refresh token to user in response for authentication.
-  const { AccessToken, RefreshToken } = await generateAccessAndRefreshToken(user._id)
+  const { AccessToken, RefreshToken } = await generateAccessAndRefreshToken(
+    user._id
+  );
 
   //10- returning response
-  return res 
+  return res
     .cookie("accessToken", AccessToken, options)
     .cookie("refreshToken", RefreshToken, options)
     .status(201)
@@ -145,7 +147,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
 const loginUser = asyncHandler(async (req, res) => {
   //1) geting data from user for authentication
-  const {email, password } = req.body;
+  const { email, password } = req.body;
 
   // 2) checking if user gave email & password or not
   if (!email?.trim()) {
@@ -187,17 +189,7 @@ const loginUser = asyncHandler(async (req, res) => {
     .status(200)
     .cookie("accessToken", AccessToken, options)
     .cookie("refreshToken", RefreshToken, options)
-    .json(
-      new ApiResponse(
-        200,
-        {
-          user: LoggedInUser,
-          AccessToken,
-          RefreshToken,
-        },
-        "User Successfully login! "
-      )
-    );
+    .json(new ApiResponse(200, LoggedInUser, "User Successfully login! "));
 });
 
 const logoutUser = asyncHandler(async (req, res) => {
