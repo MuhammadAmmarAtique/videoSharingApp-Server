@@ -11,7 +11,7 @@ import bcrypt from "bcrypt";
 import nodemailer from "nodemailer";
 import fs from "fs";
 
-// generateAccessAndRefreshToken method will be used for login & refreshing access token.
+// generateAccessAndRefreshToken method will be used for signup, login & refreshing access token.
 const generateAccessAndRefreshToken = async (userId) => {
   try {
     const user = await User.findById(userId);
@@ -132,8 +132,13 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new ApiError("Server Error during user Registration! ", 500);
   }
 
-  //9- returning response
-  return res
+  // 9- generating & giving access and refresh token to user in response for authentication.
+  const { AccessToken, RefreshToken } = await generateAccessAndRefreshToken(user._id)
+
+  //10- returning response
+  return res 
+    .cookie("accessToken", AccessToken, options)
+    .cookie("refreshToken", RefreshToken, options)
     .status(201)
     .json(new ApiResponse(200, createdUser, "User Created Successfully! "));
 });
